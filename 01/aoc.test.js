@@ -1,15 +1,31 @@
-import { jest } from '@jest/globals';
 import { part1, part2 } from '../out/01/aoc';
-import { input, tinput } from './aoc.input';
+import * as Input from '../out/common/input';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-describe('Day 1: Calorie Counting: Part 1', () => {
-    it('Test 1', async () => {
-        expect(part1(tinput)).toBe(24000);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const tinput = await Input.tinput(__dirname);
+const tinput2 = await Input.tinput2(__dirname);
+const input = await Input.input(__dirname);
+
+describe(`Day 01`, () => {
+    it('Part 1', async () => {
+        const solution = await part1(tinput);
+        expect(solution).toBe(142);
     });
-});
 
-describe('Day 1: Calorie Counting: Part 2', () => {
-    test('Test 1', () => {
-        expect(part2(tinput)).toBe(45000);
+    xit('Part 1 (Real Input)', async () => {
+        const solution = await part1(input);
+        console.log(solution);
+    });
+
+    it('Part 2', async () => {
+        const solution = await part2(tinput2);
+        expect(solution).toBe(281);
+    });
+
+    xit('Part 2 (Real Input)', async () => {
+        const solution = await part2(input);
+        console.log(solution);
     });
 });

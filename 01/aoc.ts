@@ -1,28 +1,81 @@
-class Elf {
-    readonly calories: number;
-
-    constructor(calorieArray: Array<string>) {
-        this.calories = calorieArray
-            .map(s => parseInt(s))
-            .reduce((prev, cur) => cur + prev, 0);
-    }
+const parse = (input: string) => {
+    return input.split("\n");
 }
 
-const solve = (input: string): Array<Elf> => {
-    const sanitized = input.replaceAll('\r', '');
+const digitStrings = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const digits = new Map<string, number>();
+digitStrings.forEach((digit, i) => {
+    digits.set(digit, i + 1);
+});
 
-    const elves: Array<Elf> = input
-        .replaceAll('\r', '') // Sanitize input
-        .split('\n\n') // Split into lists of calories
-        .map(e => e.split('\n')) // Convert lists into arrays
-        .map(e => new Elf(e)) // Convert into Elf objects
-        .sort((elfA, elfB) => elfB.calories - elfA.calories) // Descending
-        .slice(0, 3); // Return top 3
+const findDigitString = (line: string, index: number, isFirst: boolean) => {
+    for (const digitString of digitStrings) {
+        let subline = '';
+        if (isFirst) {
+            subline = line.substring(index, index + digitString.length);
+        } else {
+            subline = line.substring(index - digitString.length + 1, index + 1);
+        }
+        const digit = digits.get(subline);
+        if (digit) {
+            return digit;
+        }
+    }
+    return null;
+}
 
-    return elves;
-};
+const part1 = async (input: string): Promise<number | string> => {
+    const split = parse(input);
+    let calibrationTotal = 0;
+    for (const line of split) {
+        let first: number = null;
+        let firstIndex: number = -1;
+        let last: number = null;
+        let lastIndex: number = line.length;
+        while (!(first && last)) {
+            if (!first) {
+                firstIndex++;
+                first = parseInt(line[firstIndex]);
+            }
+            if (!last) {
+                lastIndex--;
+                last = parseInt(line[lastIndex]);
+            }
+        }
+        const calibration = first * 10 + last;
+        calibrationTotal += calibration;
+    }
+    return calibrationTotal;
+}
 
-const part1 = (input: string) => solve(input)[0].calories;
-const part2 = (input: string) => solve(input).reduce((prev, cur) => prev + cur.calories, 0);
+const part2 = async (input: string): Promise<number | string> => {
+    const split = parse(input);
+    let calibrationTotal = 0;
+    for (const line of split) {
+        let first: number = null;
+        let firstIndex: number = -1;
+        let last: number = null;
+        let lastIndex: number = line.length;
+        while (!(first && last)) {
+            if (!first) {
+                firstIndex++;
+                first = parseInt(line[firstIndex]);
+                if (!first) {
+                    first = findDigitString(line, firstIndex, true);
+                }
+            }
+            if (!last) {
+                lastIndex--;
+                last = parseInt(line[lastIndex]);
+                if (!last) {
+                    last = findDigitString(line, lastIndex, false);
+                }
+            }
+        }
+        const calibration = first * 10 + last;
+        calibrationTotal += calibration;
+    }
+    return calibrationTotal;
+}
 
 export { part1, part2 };

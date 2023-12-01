@@ -16,6 +16,6 @@ async function readIfExists(path) {
 }
 
 //const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 export const tinput = async (dirname:string)=> await readIfExists(path.resolve(dirname, 'tinput.txt'));
+export const tinput2 = async (dirname:string) => await readIfExists(path.resolve(dirname, 'tinput2.txt'));
 export const input = async (dirname:string)=> await readIfExists(path.resolve(dirname, 'input.txt'));
