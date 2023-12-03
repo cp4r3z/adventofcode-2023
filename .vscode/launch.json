@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "command": "npm run test_debug /${relativeFileDirname}",
+            "command": "npm run test_debug /${fileDirnameBasename}",
             "name": "npm run test_debug",
             "request": "launch",
             "type": "node-terminal",
