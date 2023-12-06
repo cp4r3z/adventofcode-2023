@@ -71,15 +71,27 @@ const part2 = async (input: string): Promise<number | string> => {
 
     const almanac: Almanac = parse(input);
 
-    const seedCandidates = []; // lol, brute force isn't going to work
-
-    for (let i = 0; i < almanac.Seeds.length; i += 2) {
-        const start = almanac.Seeds[i];
-        const range = almanac.Seeds[i + 1];
-        for (let j = start; j < start + range; j++) {
-            seedCandidates.push(j);
+    almanac.Maps.forEach(map=>{
+        console.log(map.Name);
+        let numbers = [];
+        for (let i = 0; i < 100; i++) {
+            //const element = array[i];
+            numbers.push(String(mapNumber(i,map)).padStart(2, '0'));
         }
-    }
+        console.log(numbers.join(' '));
+
+    })
+
+
+    // const seedCandidates = []; // lol, brute force isn't going to work
+
+    // for (let i = 0; i < almanac.Seeds.length; i += 2) {
+    //     const start = almanac.Seeds[i];
+    //     const range = almanac.Seeds[i + 1];
+    //     for (let j = start; j < start + range; j++) {
+    //         seedCandidates.push(j);
+    //     }
+    // }
 
     return 0;
 }
