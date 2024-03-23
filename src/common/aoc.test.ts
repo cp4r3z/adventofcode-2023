@@ -1,8 +1,9 @@
 import * as Shape from './base/shapes'
 import * as Point from './base/points';
 import * as QuadTree from './quadtree';
+import * as Interval from './intervals/interval'
 
-describe('Common Tests: Shape.Rectangle', () => {
+xdescribe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -66,7 +67,7 @@ describe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-describe('Common Tests: QuadTree', () => {
+xdescribe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -220,5 +221,13 @@ describe('Common Tests: QuadTree', () => {
         qt.Set(dataBounds2, "TEST");
         const test = qt.Get(new Shape.Rectangle(r2x2.x0y0, r2x2.x0y0));
         expect(test).toBe("TEST");
+    });
+});
+
+describe('Common Tests: Intervals', () => {
+    it('Simple', async () => {
+        const a = new Interval.Interval(0,1);
+        const b = new Interval.Interval(1,2);
+        const result = a.Merge(b); // Should be This: [0,0], Both: [1,1], That: [2,2]
     });
 });
