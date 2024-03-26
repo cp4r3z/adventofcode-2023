@@ -5,6 +5,8 @@ interface IInterval {
     Low: number,
     High: number,
     toString(): string,
+    Contains(input: number): boolean,
+    Equals(that:IInterval):boolean
 
 
 
@@ -21,6 +23,15 @@ type MergeResult = {
     Both: IInterval[]
 }
 
+export enum In { // Whether or not we're currently in the this or that intervals. Is the bracket open.
+    Null = 0,
+    This = 1 << 0, // 1
+    That = 1 << 1, // 2
+    //Both = 1 << 2, // 4
+};
+
+type Intersection = Map<number, IInterval[]>;
+
 export class Interval implements IInterval {
     // public Low: number;
     // public High: number;
@@ -35,6 +46,10 @@ export class Interval implements IInterval {
     }
 
     toString() { return "[" + this.Low + "," + this.High + "]"; };
+
+    Contains(input: number) { return input >= this.Low && input <= this.High };
+
+    Equals(that: IInterval) {return that.Low === this.Low && that.High === this.High }
 
     Merge(that: IInterval): MergeResult {
 
@@ -129,10 +144,10 @@ export class Interval implements IInterval {
                     }
                     break;
                 case State.This:
-                    
+
 
                     if (startThat) {
-                        result.This.push(new Interval(start, end-1));
+                        result.This.push(new Interval(start, end - 1));
                         prevState = State.Both;
 
                         if (endBoth) {
@@ -293,7 +308,7 @@ export class Interval implements IInterval {
         return result;
     }
 
-    IntersectWith(input: IInterval) {
+    IntersectWithOld(input: IInterval) {
         const output: IInterval[] = [];
 
         let lowInterval;
@@ -378,5 +393,50 @@ export class Interval implements IInterval {
             // Should NOT happen
             throw new Error();
         }
+    }
+
+    IntersectWith(that: IInterval): Intersection {
+
+        const endpoints = new Set<number>();
+
+        [this, that].forEach(i => {
+            endpoints.add(i.Low - 1);
+            endpoints.add(i.Low);
+            endpoints.add(i.High);
+            endpoints.add(i.High + 1);
+        });
+
+        const result = new Map<number, IInterval[]>();
+        result.set(In.This, []);
+        result.set(In.That, []);
+        result.set(In.This | In.That, []);
+        // We don't care about null for now
+
+        let state = In.Null; // Always null to start out with
+        let low: number, high: number;
+
+        [...endpoints].sort((a, b) => {
+            return a - b;
+            //return -1;
+        }).forEach((endpoint, i, arr) => {
+            // Current state
+            //if (this.Contains(endpoint) && that.Contains(endpoint))
+            let stateAtEndpoint = In.Null;
+            stateAtEndpoint |= this.Contains(endpoint) ? In.This : 0;
+            stateAtEndpoint |= that.Contains(endpoint) ? In.That : 0;
+            if (stateAtEndpoint === state) {
+                high = endpoint;
+            } else {
+                // State has changed
+                if (state !== In.Null) {
+                    // Close current interval and add it to the result array
+                    result.get(state).push(new Interval(low, high));
+                }
+                low = endpoint;
+                high = endpoint;
+                state = stateAtEndpoint;
+            }
+        });
+        return result;
     }
 }

@@ -195,7 +195,7 @@ xdescribe('Common Tests: QuadTree', () => {
     it('QuadTree Set/Get Large 2', async () => {
         const prime = 39916801; // This causes memory to blow
         const smallprime = 65537;
-        const bLarge = new QuadTree.Rectangle(new Point.XY(0, 0), new Point.XY(smallprime, smallprime), { isRoot: true,buffer:.25 });
+        const bLarge = new QuadTree.Rectangle(new Point.XY(0, 0), new Point.XY(smallprime, smallprime), { isRoot: true, buffer: .25 });
         const qtLarge = new QuadTree.QuadTree<string>(bLarge);
         const dataBounds = new Shape.Rectangle(new Point.XY(1, 1), new Point.XY(smallprime, smallprime));
         qtLarge.Set(dataBounds, "TEST");
@@ -225,9 +225,139 @@ xdescribe('Common Tests: QuadTree', () => {
 });
 
 describe('Common Tests: Intervals', () => {
-    it('Simple', async () => {
-        const a = new Interval.Interval(0,1);
-        const b = new Interval.Interval(1,2);
-        const result = a.Merge(b); // Should be This: [0,0], Both: [1,1], That: [2,2]
+    /**
+     *    -10123456789
+     * A      {     }   <- A
+     * B
+     * 0.0 |            <- highInterval length is 1
+     * 0.1 [ ]
+     * 0.2 [  ]
+     * 0.3 [   ]
+     * 1.0    |
+     * 1.1    []
+     * 1.2    [     ]   <- Equal
+     * 2.0     |
+     * 2.1     []
+     * 2.2     [    ]
+     * 3.0          |    <- highInterval length is 1
+     * 3.1          [ ]
+     * 4.0           []
+     */
+
+    const A = new Interval.Interval(2, 8);
+    // it('Simple', async () => {
+    //     const a = new Interval.Interval(0, 1);
+    //     const b = new Interval.Interval(1, 2);
+    //     //const result = a.Merge(b); // Should be This: [0,0], Both: [1,1], That: [2,2]
+    //     const result = a.IntersectWith(b);
+    // });
+
+    it('0.0', async () => {
+        const b = new Interval.Interval(-1, -1);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.That)[0]
+                .Equals(new Interval.Interval(-1, -1))
+        ).toBeTruthy();
     });
+
+    it('0.1', async () => {
+        const b = new Interval.Interval(-1, 1);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.That)[0]
+                .Equals(new Interval.Interval(-1, 1))
+        ).toBeTruthy();
+    });
+
+    it('0.2', async () => {
+        const b = new Interval.Interval(-1, 2);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(3, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(2, 2))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.That)[0]
+                .Equals(new Interval.Interval(-1, 1))
+        ).toBeTruthy();
+    });
+
+    it('0.3', async () => {
+        const b = new Interval.Interval(-1, 3);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(4, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(2, 3))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.That)[0]
+                .Equals(new Interval.Interval(-1, 1))
+        ).toBeTruthy();
+    });
+
+    it('1.0', async () => {
+        const b = new Interval.Interval(2, 2);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(3, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(2, 2))
+        ).toBeTruthy();
+    });
+
+    it('1.1', async () => {
+        const b = new Interval.Interval(2, 3);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(4, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(2, 3))
+        ).toBeTruthy();
+    });
+
+    it('1.2', async () => {
+        const b = new Interval.Interval(2, 8);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(2, 8))
+        ).toBeTruthy();
+    });
+
+    it('4.0', async () => {
+        const b = new Interval.Interval(9, 10);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.That)[0]
+                .Equals(new Interval.Interval(9, 10))
+        ).toBeTruthy();
+    });
+
 });
