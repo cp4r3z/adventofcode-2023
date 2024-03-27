@@ -347,6 +347,53 @@ describe('Common Tests: Intervals', () => {
         ).toBeTruthy();
     });
 
+    it('2.0', async () => {
+        const b = new Interval.Interval(3, 3);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 2))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This)[1]
+                .Equals(new Interval.Interval(4, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(3, 3))
+        ).toBeTruthy();
+    });
+
+    it('2.1', async () => {
+        const b = new Interval.Interval(3, 4);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 2))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This)[1]
+                .Equals(new Interval.Interval(5, 8))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(3, 4))
+        ).toBeTruthy();
+    });
+
+    it('3.0', async () => {
+        const b = new Interval.Interval(8, 8);
+        const result = A.IntersectWith(b);
+        expect(
+            result.get(Interval.In.This)[0]
+                .Equals(new Interval.Interval(2, 7))
+        ).toBeTruthy();
+        expect(
+            result.get(Interval.In.This | Interval.In.That)[0]
+                .Equals(new Interval.Interval(8, 8))
+        ).toBeTruthy();
+    });
+
     it('4.0', async () => {
         const b = new Interval.Interval(9, 10);
         const result = A.IntersectWith(b);
