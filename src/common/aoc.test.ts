@@ -245,12 +245,6 @@ describe('Common Tests: Intervals', () => {
      */
 
     const A = new Interval.Interval(2, 8);
-    // it('Simple', async () => {
-    //     const a = new Interval.Interval(0, 1);
-    //     const b = new Interval.Interval(1, 2);
-    //     //const result = a.Merge(b); // Should be This: [0,0], Both: [1,1], That: [2,2]
-    //     const result = a.IntersectWith(b);
-    // });
 
     it('0.0', async () => {
         const b = new Interval.Interval(-1, -1);

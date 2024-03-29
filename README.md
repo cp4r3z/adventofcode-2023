@@ -4,7 +4,17 @@ https://adventofcode.com/2023
 [![Build Status](https://github.com/cp4r3z/adventofcode-2023/actions/workflows/node.js.yml/badge.svg)](https://github.com/cp4r3z/adventofcode-2023/actions)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cp4r3z/adventofcode-2023/main/LICENSE)
 
-## Setup
+# Notables
+
+## Day 5
+
+Brute force solution found on the day, but a performant solution took... a long time.
+Involves Intervals, for which a common module was built with unit tests.
+The solution Intersection of Intervals into a tree structure, and then traversing for a min value.
+
+# Setup
+
+## Building
 
 ```
 npm install -g typescript
