@@ -1,12 +1,13 @@
 // Consider an interface?
 
-interface IInterval {
+export interface IInterval {
     // Apparently we cannot define constructor signatures here...
     Low: number,
     High: number,
     toString(): string,
     Contains(input: number): boolean,
-    Equals(that: IInterval): boolean
+    Equals(that: IInterval): boolean,
+    IntersectWith(that: IInterval): Intersection
 }
 
 export enum In { // Whether or not we're currently in the this or that intervals. Is the bracket open.

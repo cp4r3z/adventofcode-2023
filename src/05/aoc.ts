@@ -1,119 +1,139 @@
-type MapRange = {
-    SourceStart: number,
-    SourceEnd: number
-    Range: number,
-    DestinationStart: number
+import * as Interval from '../common/intervals/interval'
+
+type Almanac = {
+    Seeds: number[],
+    // For Part 1
+    SeedsAsIntervals: Interval.IInterval[],
+    // For Part 2
+    SeedIntervals: Interval.IInterval[]
+    Maps: Map[]
 }
 
 type Map = {
     Name: string,
-    Ranges: MapRange[]
+    Intervals: MapInterval[]
 }
 
-type Almanac = {
-    Seeds: number[],
-    Maps: Map[]
+type MapInterval = {
+    Interval: Interval.IInterval,
+    StartValue: number
 }
 
-type Map2 = {
-    Name: string,
-    Ranges: MapRange2[]
-}
-
-type Almanac2 = {
-    Seeds: number[],
-    Maps: Map2[]
-}
-
-type MapRange2 = {
-    Name: string,
-    DestStart: number,
-    SourceStart: number,
-    Length: number
+type IntervalToCategory = {
+    Interval: Interval.IInterval,
+    Category: Category
 }
 
 class Category {
-    public static Almanac: Almanac2;
-    
-    private readonly _mapRange: MapRange2;
-        
-    // Name: string;
-    // SourceStart: number;
-    // Length: number;
-    // Transform: number;
-
-    // Link Parent?
-    Children: Category[] = [];
-
-    // Construct with a Map?
-    //constructor(name: string, destStart: number, sourceStart: number, length: number) {
-    constructor( mapRange:MapRange2) {
-        //this._almanac = almanac;
-        this._mapRange = mapRange;
-        //this.Children = [];
-        // this.Name = definition.Name;
-        // this.SourceStart = definition.SourceStart;
-        // this.Length = length;
-        // this.Transform = destStart - sourceStart;        
+    public Name: string;
+    public Out: IntervalToCategory[] = [];
+    constructor(public Almanac: Almanac, public MapIndex: number, public Interval: Interval.IInterval) {
+        if (MapIndex === 7) {
+            this.Name = 'location';
+        } else {
+            this.Name = Almanac.Maps[MapIndex].Name;
+        }
+        this.PopulateOut();
     }
 
-    // Derived Properties
-
-    get Name() { return this._mapRange.Name };
-    get SourceStart() { return this._mapRange.SourceStart};
-    get Length() { return this._mapRange.Length };
-    get SourceEnd() { return this.SourceStart + this.Length - 1 };
-    get DestStart() { return this._mapRange.DestStart };
-    get Transform() { return this._mapRange.DestStart - this.SourceStart};        
-    get DestEnd() { return this.DestStart + this.Transform };
-
-    PopulateChildren(mapIndex){
-        const map = Category.Almanac.Maps[mapIndex];
-        // Intersect the current children with the supplied map
-        if (!this.Children.length){                        
-            const initial:MapRange2 = {
-                Name:map.Name,
-                DestStart:this.DestStart,
-                SourceStart:this.SourceStart,
-                Length:this.Length                
-            }
-            this.Children.push(new Category(initial));
+    PopulateOut() {
+        if (this.MapIndex > this.Almanac.Maps.length - 1) {
+            return;
         }
-        
-        map.Ranges
-        .sort((a,b)=>a.SourceStart-b.SourceStart)
-        .forEach(range=>{
-            // intersect
-            debugger;
+
+        this.Almanac.Maps[this.MapIndex].Intervals.forEach(mapInterval => {
+            const intersection = this.Interval.IntersectWith(mapInterval.Interval);
+
+            const inBoth: IntervalToCategory[] = intersection.get(Interval.In.This | Interval.In.That).map(interval => {
+                const offset = mapInterval.StartValue - mapInterval.Interval.Low;
+                return {
+                    Interval: interval,
+                    Category: new Category(this.Almanac, this.MapIndex + 1, new Interval.Interval(interval.Low + offset, interval.High + offset))
+                };
+            });
+            this.Out = this.Out.concat(inBoth);
+
         });
+
+        let unmapped: Interval.IInterval[] = [new Interval.Interval(this.Interval.Low, this.Interval.High)];
+
+        this.Almanac.Maps[this.MapIndex].Intervals.forEach(mapInterval => {
+            let unmappedAfter = [];
+            unmapped.forEach(unMappedInterval => {
+                const intersection = unMappedInterval.IntersectWith(mapInterval.Interval);
+                unmappedAfter = unmappedAfter.concat(intersection.get(Interval.In.This)); // spread?
+            });
+            unmapped = unmappedAfter;
+        });
+
+        unmapped.forEach(interval => {
+            this.Out.push({
+                Interval: interval,
+                Category: new Category(this.Almanac, this.MapIndex + 1, interval)
+            });
+        });
+    }
+
+    FindMinimum(): number {
+        if (this.MapIndex === 7) {
+            return this.Interval.Low;
+        } else {
+            if (this.Out.length === 0) {
+                return Number.MAX_SAFE_INTEGER;
+            }
+        }
+
+        const min = this.Out.reduce((prev, inttocat) => {
+            const curMin = inttocat.Category.FindMinimum();
+            return curMin < prev ? curMin : prev;
+        }, Number.MAX_SAFE_INTEGER);
+
+        return min;
     }
 }
 
 const parseToMap = (input: string): Map => {
     const lines = input.split('\n');
     const name = lines[0].match(/(.+) map/)[1];
-    const ranges: MapRange[] = lines.splice(1).map(line => {
+    const ranges: MapInterval[] = lines.splice(1).map(line => {
         const digits = line.match(/(\d+)/g).map(s => parseInt(s));
-        const range: MapRange = {
-            DestinationStart: digits[0],
-            SourceStart: digits[1],
-            SourceEnd: digits[1] + digits[2] - 1,
-            Range: digits[2]
-        }
+        const range: MapInterval = {
+            Interval: new Interval.Interval(digits[1], digits[1] + digits[2] - 1),
+            StartValue: digits[0]
+        };
         return range;
     });
     return {
         Name: name,
-        Ranges: ranges
+        Intervals: ranges
     }
 }
 
 const parse = (input: string): Almanac => {
     const sections = input.split("\n\n");
-    const almanac = {
-        Seeds: sections[0].match(/(\d+)/g).map(s => parseInt(s)),
+    const seeds = sections[0].match(/(\d+)/g).map(s => parseInt(s));
+
+    // For Part 1
+    const seedsAsIntervals = [];
+    for (let i = 0; i < seeds.length; i++) {
+        seedsAsIntervals.push(new Interval.Interval(seeds[i], seeds[i]));
+    }
+
+    // For Part 2
+    const seedIntervals = [];
+    for (let i = 0; i < seeds.length - 1; i += 2) {
+        const seedStart = seeds[i];
+        const seedEnd = seedStart + seeds[i + 1] - 1;
+        seedIntervals.push(new Interval.Interval(seedStart, seedEnd));
+    }
+
+    const almanac: Almanac = {
+        Seeds: seeds,
+        SeedsAsIntervals: seedsAsIntervals,
+        SeedIntervals: seedIntervals,
         Maps: []
     };
+
     for (let i = 1; i <= 7; i++) {
         almanac.Maps.push(parseToMap(sections[i]));
     }
@@ -121,102 +141,28 @@ const parse = (input: string): Almanac => {
     return almanac;
 };
 
-const parseToMap2 = (input: string): Map2 => {
-    const lines = input.split('\n');
-    const name = lines[0].match(/(.+) map/)[1];
-    const ranges: MapRange2[] = lines.splice(1).map(line => {
-        const digits = line.match(/(\d+)/g).map(s => parseInt(s));
-        const range: MapRange2 = {
-            Name: name,
-            DestStart: digits[0],
-            SourceStart: digits[1],
-            //SourceEnd: digits[1] + digits[2] - 1,
-            Length: digits[2]
-        }
-        return range;
-    });
-    return {
-        Name: name,
-        Ranges: ranges
-    }
-}
-
-const parse2 = (input: string): Almanac2 => {
-    const sections = input.split("\n\n");
-    const almanac:Almanac2 = {
-        Seeds: sections[0].match(/(\d+)/g).map(s => parseInt(s)),
-        Maps: []
-    };
-    for (let i = 1; i <= 7; i++) {
-        almanac.Maps.push(parseToMap2(sections[i]));
-    }
-
-    return almanac;
-};
-
-
-
-const mapNumber = (n: number, map: Map): number => {
-    for (const range of map.Ranges) {
-        if (n >= range.SourceStart && n <= range.SourceEnd) {
-            return (n - range.SourceStart) + range.DestinationStart;
-        }
-    }
-    return n;
-};
-
 const part1 = async (input: string): Promise<number | string> => {
-    const almanac: Almanac = parse(input);
+    const almanac = parse(input);
 
-    const part1 = almanac.Seeds.map(seed =>
-        almanac.Maps.reduce((n, map) =>
-            mapNumber(n, map), seed))
-        .sort((a, b) => a - b)[0];
+    const seeds = almanac.SeedsAsIntervals.map(seedInterval => {
+        return new Category(almanac, 0, seedInterval);
+    });
 
-    return part1;
-}
+    // Traverse to find lowest.
+    const min = seeds.map(s => s.FindMinimum()).sort((a, b) => a - b)[0];
+    return min;
+};
 
 const part2 = async (input: string): Promise<number | string> => {
+    const almanac = parse(input);
 
-    //const almanac: Almanac2 = parse2(input);
-    Category.Almanac = parse2(input);
+    const seeds = almanac.SeedIntervals.map(seedInterval => {
+        return new Category(almanac, 0, seedInterval);
+    });
 
-    const initialMap:MapRange2 = {
-        Name: 'initial',
-        DestStart: 0,
-        SourceStart: 0,
-        Length: 100
-    };
-
-    const categoryTree = new Category(initialMap);
-
-    
-
-categoryTree.PopulateChildren(0);
-
-    // almanac.Maps.forEach(map=>{
-    //     console.log(map.Name);
-    //     let numbers = [];
-    //     for (let i = 0; i < 100; i++) {
-    //         //const element = array[i];
-    //         numbers.push(String(mapNumber(i,map)).padStart(2, '0'));
-    //     }
-    //     console.log(numbers.join(' '));
-
-    // })
-
-
-    // const seedCandidates = []; // lol, brute force isn't going to work
-
-    // for (let i = 0; i < almanac.Seeds.length; i += 2) {
-    //     const start = almanac.Seeds[i];
-    //     const range = almanac.Seeds[i + 1];
-    //     for (let j = start; j < start + range; j++) {
-    //         seedCandidates.push(j);
-    //     }
-    // }
-
-    return 0;
+    // Traverse to find lowest.
+    const min = seeds.map(s => s.FindMinimum()).sort((a, b) => a - b)[0];
+    return min;
 }
 
 export { part1, part2 };

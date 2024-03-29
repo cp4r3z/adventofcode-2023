@@ -9,23 +9,23 @@ const tinput = await Input.tinput(__dirname);
 const input = await Input.input(__dirname);
 
 describe(`Day 05`, () => {
-    xit('Part 1', async () => {
+    it('Part 1', async () => {
         const solution = await part1(tinput);
         expect(solution).toBe(35);
     });
 
     xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
-        console.log(solution);
+        console.log(solution); // 600279879
     });
 
     it('Part 2', async () => {
         const solution = await part2(tinput);
-        expect(solution).toBe(30);
+        expect(solution).toBe(46);
     });
 
     xit('Part 2 (Real Input)', async () => {
         const solution = await part2(input);
-        console.log(solution);
+        console.log(solution); // 20191102
     });
 });
