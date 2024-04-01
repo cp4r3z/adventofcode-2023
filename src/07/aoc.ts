@@ -50,7 +50,7 @@ class Hand {
             if (card.Label === 'J') {
                 jokerCount++;
             }
-            const place = Math.pow(13, this.Cards.length - 1 - i);
+            const place = Math.pow(14, this.Cards.length - 1 - i);
             this.Value += (card.Value * place);
         }
         cardCount = cardCount.filter(c => c > 0).sort((a, b) => b - a); // Descending

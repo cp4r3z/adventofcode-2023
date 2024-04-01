@@ -16,7 +16,7 @@ describe(`Day 07`, () => {
 
     xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
-        console.log(solution); // 251106089
+        console.log(solution);
     });
 
     it('Part 2', async () => {
@@ -26,6 +26,6 @@ describe(`Day 07`, () => {
 
     xit('Part 2 (Real Input)', async () => {
         const solution = await part2(input);
-        console.log(solution); // 248747916 is too low, 249613376 too low
+        console.log(solution);
     });
 });
