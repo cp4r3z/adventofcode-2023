@@ -33,3 +33,9 @@ jobs:
     #- run: npm run prettier
     #- run: npm run linter
     - run: npm test
+    - uses: dorny/test-reporter@v1
+      with:
+        artifact: test-results            # artifact name
+        name: JEST Tests                  # Name of the check run which will be created
+        path: '*.xml'                     # Path to test results (inside artifact .zip)
+        reporter: jest-junit              # Format of test results
