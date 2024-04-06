@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build_test_report:
-    name: Build, Unit Test and Report Results
+    name: Build, Test & Report
 
     runs-on: ubuntu-latest
     env:
@@ -31,10 +31,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js $node-version
+    - name: Use Node.js ${{node-version}}
       uses: actions/setup-node@v4
       with:
-        node-version: $node-version
+        node-version: ${{node-version}}
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
