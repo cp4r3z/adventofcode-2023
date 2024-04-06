@@ -30,7 +30,8 @@ jobs:
     #     # https://nodejs.org/api/esm.html#modules-ecmascript-modules
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Latest
+      uses: actions/checkout@v4
     - name: Use Node.js ${{env.node-version}}
       uses: actions/setup-node@v4
       with:
