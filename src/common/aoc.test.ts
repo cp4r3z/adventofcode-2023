@@ -1,7 +1,8 @@
-import * as Shape from './base/shapes'
+import * as Shape from './base/shapes';
 import * as Point from './base/points';
 import * as QuadTree from './quadtree';
-import * as Interval from './intervals/interval'
+import * as Interval from './intervals/interval';
+import BinaryTree from './trees/binary';
 
 describe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
@@ -399,6 +400,15 @@ describe('Common Tests: Intervals', () => {
             result.get(Interval.In.That)[0]
                 .Equals(new Interval.Interval(9, 10))
         ).toBeTruthy();
+    });
+
+});
+
+describe('Common Tests: Trees', () => {
+    it('Construct Tree with N Leaves', async () => {
+        const tree = BinaryTree.CreateLevels(6, 0);
+        const count = tree.LevelCount();
+        expect(count).toEqual(6);
     });
 
 });
