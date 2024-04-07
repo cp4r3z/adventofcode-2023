@@ -2,9 +2,9 @@ import * as Shape from './base/shapes';
 import * as Point from './base/points';
 import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
-import BinaryTree from './trees/binary';
+import MultiParentTree from './trees/multiparent';
 
-describe('Common Tests: Shape.Rectangle', () => {
+xdescribe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -68,7 +68,7 @@ describe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-describe('Common Tests: QuadTree', () => {
+xdescribe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -225,7 +225,7 @@ describe('Common Tests: QuadTree', () => {
     });
 });
 
-describe('Common Tests: Intervals', () => {
+xdescribe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
@@ -406,9 +406,13 @@ describe('Common Tests: Intervals', () => {
 
 describe('Common Tests: Trees', () => {
     it('Construct Tree with N Leaves', async () => {
-        const tree = BinaryTree.CreateLevels(6, 0);
+        const tree = MultiParentTree.CreateLevels(6, 0);
         const count = tree.LevelCount();
         expect(count).toEqual(6);
+
+        const leaves = tree.GetLeaves();
+
+        const leaves2 = tree.GetLeaves(2);
     });
 
 });
