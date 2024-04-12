@@ -4,7 +4,7 @@ import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
 import MultiParentTree from './trees/multiparent';
 
-xdescribe('Common Tests: Shape.Rectangle', () => {
+describe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -68,7 +68,7 @@ xdescribe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-xdescribe('Common Tests: QuadTree', () => {
+describe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -225,7 +225,7 @@ xdescribe('Common Tests: QuadTree', () => {
     });
 });
 
-xdescribe('Common Tests: Intervals', () => {
+describe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
@@ -405,14 +405,17 @@ xdescribe('Common Tests: Intervals', () => {
 });
 
 describe('Common Tests: Trees', () => {
-    it('Construct Tree with N Leaves', async () => {
-        const tree = MultiParentTree.CreateLevels(6, 0);
-        const count = tree.LevelCount();
-        expect(count).toEqual(6);
-
-        const leaves = tree.GetLeaves();
-
-        const leaves2 = tree.GetLeaves(2);
+    it('Construct MultiParentTree with N Leaves', async () => {
+        const tree = MultiParentTree.CreateLevels(5, 0);
+        const numbers = [-2, -1, 0, 1, 2];
+        for (let i = 0; i < numbers.length; i++) {
+            const number = numbers[i];
+            tree.Leaves[i].Data = number;
+        }
+        expect(tree.Root.Data).toBe(0);
+        expect(tree.Root.Left.Left.Left.Left.Data).toBe(-2);
+        expect(tree.Leaves[0].RightParent.Right.Data).toBe(-1);
+        expect(tree.Leaves[4].LeftParent.Left.Data).toBe(1);
+        expect(tree.LevelCount()).toBe(5);
     });
-
 });

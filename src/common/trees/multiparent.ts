@@ -1,27 +1,11 @@
 export class Node {
     public Left: Node;
     public Right: Node;
+    public LeftParent: Node;
+    public RightParent: Node;
 
     constructor(public Data: any = null) { }
-
-    CreateLevels(n: number, data: any = null) {
-        if (n - 1 === 0) {
-            // Leaf
-            return;
-        }
-        this.Data = data;
-        this.Left = new Node(data);
-        this.Left.CreateLevels(n - 1, data);
-        this.Right = new Node(data);
-        this.Right.CreateLevels(n - 1, data);
-    }
 }
-
-// export class Node2 extends Node{
-//     constructor(public Data: number){
-//         super(Data);
-//     }
-// }
 
 // This is not technically a tree, but a graph that looks like a tree
 //     .
@@ -33,11 +17,54 @@ export default class MultiParentTree {
     // Creates a tree with n levels (and n leaves)
     static CreateLevels(n: number, data: any = null) {
         const tree = new this();
-        tree.Root = new Node(data);
-        tree.Root.CreateLevels(n, data);
+        const levels = [];
+        for (let levelLength = 1; levelLength <= n; levelLength++) {
+            let level = new Array(levelLength).fill(null);
+            level = level.map(x => new Node(data));
+            if (levelLength === 1) {
+                tree.Root = level[0];
+            }
+            if (levelLength === n) {
+                tree.Leaves = level;
+            }
+            levels.push(level);
+        }
+
+        for (let i = 0; i < levels.length; i++) {
+            const level = levels[i];
+            for (let j = 0; j < level.length; j++) {
+                const node: Node = level[j];
+                if (i + 1 <= levels.length - 1) {
+                    // Children
+                    const childLevel = levels[i + 1];
+                    // Left
+                    //if (j > 0) {
+                    node.Left = childLevel[j];
+                    //}
+                    // Right
+                    if (j + 1 < childLevel.length) {
+                        node.Right = childLevel[j + 1];
+                    }
+                }
+                if (i > 0) {
+                    // Parents
+                    const parentLevel = levels[i - 1];
+                    // Left
+                    //if (j > 0) {
+                    node.LeftParent = parentLevel[j - 1];
+                    //}
+                    // Right
+                    if (j < parentLevel.length) {
+                        node.RightParent = parentLevel[j];
+                    }
+                }
+            }
+        }
         return tree;
     }
+
     public Root: Node;
+    public Leaves: Node[];
 
     LevelCount(): number {
 
@@ -55,73 +82,31 @@ export default class MultiParentTree {
         return boxed.count;
     }
 
-    TraverseLeft = (node: Node, traverseObject: { depth: number, maxDepth: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
+    TraverseLeft = (node: Node, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
         traverseObject.depth++;
         if (traverseObject.maxDepth && traverseObject.depth > traverseObject.maxDepth) { return; }
-
-        if (!traverseObject.onlyLeaf){
-            // TODO!!!!!!
+        if (!node.Left) {
+            // I'm a leaf 
+            traverseObject.nodeArray.push(node);
+            return;
         }
-
-        traverseObject.nodeArray.push(node);
-
-        if (!node.Left) { return; } // I'm a leaf     
+        if (!traverseObject.onlyLeaf) {
+            traverseObject.nodeArray.push(node);
+        }
         this.TraverseLeft(node.Left, traverseObject);
-
     }
 
-    TraverseRight = (node: Node, traverseObject: { depth: number, maxDepth: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
+    TraverseRight = (node: Node, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
         traverseObject.depth++;
         if (traverseObject.maxDepth && traverseObject.depth > traverseObject.maxDepth) { return; }
-
-        traverseObject.nodeArray.push(node);
-
-        if (!node.Right) { return; } // I'm a leaf     
+        if (!node.Right) {
+            // I'm a leaf 
+            traverseObject.nodeArray.push(node);
+            return;
+        }
+        if (!traverseObject.onlyLeaf) {
+            traverseObject.nodeArray.push(node);
+        }
         this.TraverseRight(node.Right, traverseObject);
-
-    }
-
-    // no...
-    // get left "edge"
-    // then go right until leaves
-    GetLeaves(maxDepth?: number): Node[] {
-        const nodeArray: Node[] = [];
-
-        // Go Left
-
-        const leftArray: Node[] = [];
-        let traverseObject = { depth: 0, maxDepth, nodeArray: leftArray, onlyLeaf: false };
-
-        this.TraverseLeft(this.Root, traverseObject);
-
-        // Now Go Right
-
-        let depth = 0;
-        while (leftArray.length) {
-            const leftNode = leftArray.pop();
-            traverseObject = { depth: 0, maxDepth, nodeArray, onlyLeaf: true };
-            this.TraverseRight(leftNode, traverseObject);
-            depth++;
-        }
-
-
-
-        const boxed = { depth: 0, nodeArray };
-
-        const findLeaf = (node: Node, boxedObj) => {
-            boxedObj.depth++;
-            if (!(node.Left && node.Right)) {
-                boxedObj.nodeArray.push(node);
-            } else if (maxDepth && boxedObj.depth === maxDepth) {
-                boxedObj.nodeArray.push(node);
-            } else {
-                findLeaf(node.Left, boxedObj);
-                findLeaf(node.Right, boxedObj);
-            }
-        }
-
-        findLeaf(this.Root, boxed);
-
-        return nodeArray;
     }
 }
