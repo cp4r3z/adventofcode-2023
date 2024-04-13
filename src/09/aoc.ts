@@ -50,7 +50,7 @@ const part1 = async (input: string): Promise<number | string> => {
         const nextValue = -history.Root.Data;
         sum += nextValue;
 
-        history.Leaves[parsedHistory.length].Set(nextValue); // Fix Tree (not necessary)
+        //history.Leaves[parsedHistory.length].Set(nextValue); // Fix Tree (not necessary)
         //console.log(`Next Value = ${nextValue}`);
     }
 
@@ -58,7 +58,28 @@ const part1 = async (input: string): Promise<number | string> => {
 };
 
 const part2 = async (input: string): Promise<number | string> => {
-    return 0
+    const parsedHistories = parse(input);
+
+    let sum = 0;
+
+    for (const parsedHistory of parsedHistories) {
+        const numLeavesToCreate = parsedHistory.length + 1;
+
+        const history = MultiParentTree.CreateLevels<HistoryNode>(HistoryNode, numLeavesToCreate, 0);
+
+        for (let i=0; i < parsedHistory.length; i++) {
+            const value = parsedHistory[i];
+            history.Leaves[i+1].Set(value); // <-- The +1 shifts the leaf values to the right
+        }
+
+        const nextValue = -history.Root.Data; // <-- We no longer have to invert Data?
+        sum += nextValue;
+
+        //history.Leaves[parsedHistory.length].Set(nextValue); // Fix Tree (not necessary)
+        //console.log(`Next Value = ${nextValue}`);
+    }
+
+    return sum;
 };
 
 export { part1, part2 };
