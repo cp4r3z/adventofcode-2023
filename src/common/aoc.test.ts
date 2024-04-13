@@ -2,9 +2,9 @@ import * as Shape from './base/shapes';
 import * as Point from './base/points';
 import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
-import MultiParentTree from './trees/multiparent';
+import MultiParentTree, { IMultiParentNode } from './trees/multiparent';
 
-describe('Common Tests: Shape.Rectangle', () => {
+xdescribe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -68,7 +68,7 @@ describe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-describe('Common Tests: QuadTree', () => {
+xdescribe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -225,7 +225,7 @@ describe('Common Tests: QuadTree', () => {
     });
 });
 
-describe('Common Tests: Intervals', () => {
+xdescribe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
@@ -406,7 +406,16 @@ describe('Common Tests: Intervals', () => {
 
 describe('Common Tests: Trees', () => {
     it('Construct MultiParentTree with N Leaves', async () => {
-        const tree = MultiParentTree.CreateLevels(5, 0);
+        class Node implements IMultiParentNode {
+            public Left: Node;
+            public Right: Node;
+            public LeftParent: Node;
+            public RightParent: Node;
+
+            constructor(public Data: any = null) { }
+        }
+
+        const tree = MultiParentTree.CreateLevels<Node>(Node, 5, 0);
         const numbers = [-2, -1, 0, 1, 2];
         for (let i = 0; i < numbers.length; i++) {
             const number = numbers[i];

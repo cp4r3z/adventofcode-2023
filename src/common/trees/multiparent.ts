@@ -1,10 +1,9 @@
-export class Node {
-    public Left: Node;
-    public Right: Node;
-    public LeftParent: Node;
-    public RightParent: Node;
-
-    constructor(public Data: any = null) { }
+export interface IMultiParentNode {
+    Data: any;
+    Left: IMultiParentNode;
+    Right: IMultiParentNode;
+    LeftParent: IMultiParentNode;
+    RightParent: IMultiParentNode;
 }
 
 // This is not technically a tree, but a graph that looks like a tree
@@ -13,14 +12,15 @@ export class Node {
 //   .  .
 //  /\ /\
 // .  .  .
-export default class MultiParentTree {
+export default class MultiParentTree<T extends IMultiParentNode> {
     // Creates a tree with n levels (and n leaves)
-    static CreateLevels(n: number, data: any = null) {
-        const tree = new this();
+    // Sort of a factory pattern within a factory pattern?
+    static CreateLevels<T extends IMultiParentNode>(c: new (data: any) => T, n: number, data: any = null) {
+        const tree = new this<T>();
         const levels = [];
         for (let levelLength = 1; levelLength <= n; levelLength++) {
             let level = new Array(levelLength).fill(null);
-            level = level.map(x => new Node(data));
+            level = level.map(x => new c(data));
             if (levelLength === 1) {
                 tree.Root = level[0];
             }
@@ -33,14 +33,12 @@ export default class MultiParentTree {
         for (let i = 0; i < levels.length; i++) {
             const level = levels[i];
             for (let j = 0; j < level.length; j++) {
-                const node: Node = level[j];
+                const node: T = level[j];
                 if (i + 1 <= levels.length - 1) {
                     // Children
                     const childLevel = levels[i + 1];
                     // Left
-                    //if (j > 0) {
                     node.Left = childLevel[j];
-                    //}
                     // Right
                     if (j + 1 < childLevel.length) {
                         node.Right = childLevel[j + 1];
@@ -50,9 +48,7 @@ export default class MultiParentTree {
                     // Parents
                     const parentLevel = levels[i - 1];
                     // Left
-                    //if (j > 0) {
                     node.LeftParent = parentLevel[j - 1];
-                    //}
                     // Right
                     if (j < parentLevel.length) {
                         node.RightParent = parentLevel[j];
@@ -63,13 +59,13 @@ export default class MultiParentTree {
         return tree;
     }
 
-    public Root: Node;
-    public Leaves: Node[];
+    public Root: T;
+    public Leaves: T[];
 
     LevelCount(): number {
 
         const boxed = { count: 0 };
-        const traverseLeft = (node: Node, obj) => {
+        const traverseLeft = (node: IMultiParentNode, obj) => {
             obj.count++;
             if (!node.Left) {
                 return;
@@ -82,7 +78,7 @@ export default class MultiParentTree {
         return boxed.count;
     }
 
-    TraverseLeft = (node: Node, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
+    TraverseLeft = (node: IMultiParentNode, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: IMultiParentNode[] }) => {
         traverseObject.depth++;
         if (traverseObject.maxDepth && traverseObject.depth > traverseObject.maxDepth) { return; }
         if (!node.Left) {
@@ -96,7 +92,7 @@ export default class MultiParentTree {
         this.TraverseLeft(node.Left, traverseObject);
     }
 
-    TraverseRight = (node: Node, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: Node[] }) => {
+    TraverseRight = (node: IMultiParentNode, traverseObject: { depth: number, maxDepth?: number, onlyLeaf: boolean, nodeArray: IMultiParentNode[] }) => {
         traverseObject.depth++;
         if (traverseObject.maxDepth && traverseObject.depth > traverseObject.maxDepth) { return; }
         if (!node.Right) {
