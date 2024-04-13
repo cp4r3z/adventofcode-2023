@@ -4,7 +4,7 @@ import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
 import MultiParentTree, { IMultiParentNode } from './trees/multiparent';
 
-xdescribe('Common Tests: Shape.Rectangle', () => {
+describe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -68,7 +68,7 @@ xdescribe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-xdescribe('Common Tests: QuadTree', () => {
+describe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -225,7 +225,7 @@ xdescribe('Common Tests: QuadTree', () => {
     });
 });
 
-xdescribe('Common Tests: Intervals', () => {
+describe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
