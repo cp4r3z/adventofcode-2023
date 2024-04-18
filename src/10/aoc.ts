@@ -1,3 +1,5 @@
+import { XY as Coor } from "../common/base/points";
+
 enum Direction {
     North = 1 << 0, // 1
     South = 1 << 1, // 2
@@ -6,39 +8,43 @@ enum Direction {
 }
 
 const CharToDirection = new Map<string, Direction>();
-/*
-| is a vertical pipe connecting north and south.
-- is a horizontal pipe connecting east and west.
-L is a 90-degree bend connecting north and east.
-J is a 90-degree bend connecting north and west.
-7 is a 90-degree bend connecting south and west.
-F is a 90-degree bend connecting south and east.
-. is ground; there is no pipe in this tile.
-S is the starting position of the animal; there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
-*/
 CharToDirection.set('|', Direction.North | Direction.South);
 CharToDirection.set('-', Direction.East | Direction.West);
 CharToDirection.set('L', Direction.North | Direction.East);
 CharToDirection.set('J', Direction.North | Direction.West);
 CharToDirection.set('7', Direction.South | Direction.West);
 CharToDirection.set('F', Direction.South | Direction.East);
-//CharToDirection.set('.',Direction.North|Direction.South);
-//CharToDirection.set('S',Direction.North|Direction.South);
 
 class Node {
     private _input: string;
     public Direction: number;
-    public North: Node;
-    public South: Node;
-    public East: Node;
-    public West: Node;
-    public Coor: string;
+    public Nodes: {
+        North: null | Node,
+        South: null | Node,
+        East: null | Node,
+        West: null | Node
+    };
+    public Coor: Coor;
     public IsStart: boolean;
     constructor(input: string) {
+        this.Nodes = {
+            North: null,
+            South: null,
+            East: null,
+            West: null
+        };
         this._input = input;
         this.Direction = CharToDirection.get(input) || 0;
         if (input === 'S') {
             this.IsStart = true;
+        }
+    }
+    NextNode(prev: Node) {
+        for (const direction in this.Nodes) {
+            const nextMaybe = this.Nodes[direction];
+            if (nextMaybe && nextMaybe !== prev) {
+                return nextMaybe;
+            }
         }
     }
 }
@@ -61,42 +67,58 @@ const parse = (input: string) => {
         row.forEach((node, x) => {
             // North
             if (Direction.North & node.Direction && y > 0) {
-                node.North = parsed[y - 1][x];
-                if (node.North.IsStart) {
-                    node.North.South = node;
+                node.Nodes.North = parsed[y - 1][x];
+                if (node.Nodes.North.IsStart) {
+                    node.Nodes.North.Nodes.South = node;
                 }
             }
             // South
             if (Direction.South & node.Direction && y < parsed.length - 1) {
-                node.South = parsed[y + 1][x];
-                if (node.South.IsStart) {
-                    node.South.North = node;
+                node.Nodes.South = parsed[y + 1][x];
+                if (node.Nodes.South.IsStart) {
+                    node.Nodes.South.Nodes.North = node;
                 }
             }
             // East
             if (Direction.East & node.Direction && x < parsed[0].length - 1) {
-                node.East = parsed[y][x + 1];
-                if (node.East.IsStart) {
-                    node.East.West = node;
+                node.Nodes.East = parsed[y][x + 1];
+                if (node.Nodes.East.IsStart) {
+                    node.Nodes.East.Nodes.West = node;
                 }
             }
             // West   
             if (Direction.West & node.Direction && x > 0) {
-                node.West = parsed[y][x - 1];
-                if (node.West.IsStart) {
-                    node.West.East = node;
+                node.Nodes.West = parsed[y][x - 1];
+                if (node.Nodes.West.IsStart) {
+                    node.Nodes.West.Nodes.East = node;
                 }
             }
-            node.Coor = `x:${x},y"${y}`;
+            node.Coor = new Coor(x, y);
         });
     });
     return { parsed, start };
 };
 
-const part1 = async (input: string): Promise<number | string> => {
-    const parsed = parse(input);
+const walk = (start: Node) => {
+    let current: Node = start;
+    const path = [];
+    let next = start.Nodes.North ||
+        start.Nodes.South ||
+        start.Nodes.East ||
+        start.Nodes.West;
+    do {
+        path.push(current);
+        const prev = current;
+        current = next;
+        next = current.NextNode(prev);
+    } while (current !== start);
+    return path;
+};
 
-    return 0;
+const part1 = async (input: string): Promise<number | string> => {
+    const { parsed, start } = parse(input);
+    const path = walk(start);
+    return path.length / 2;
 };
 
 const part2 = async (input: string): Promise<number | string> => {

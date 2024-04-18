@@ -9,7 +9,7 @@ const tinput2 = await Input.tinput2(__dirname);
 const input = await Input.input(__dirname);
 
 describe(`Day 10`, () => {
-    xit('Part 1', async () => {
+    it('Part 1', async () => {
         const solution = await part1(tinput);
         expect(solution).toBe(8);
     });
