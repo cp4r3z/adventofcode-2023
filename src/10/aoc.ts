@@ -15,8 +15,14 @@ CharToDirection.set('J', Direction.North | Direction.West);
 CharToDirection.set('7', Direction.South | Direction.West);
 CharToDirection.set('F', Direction.South | Direction.East);
 
+const directionToChar = (direction: Direction) => {
+    let keysValues = Array.from(CharToDirection.entries());
+    const foundEntry = keysValues.find(([key, value]) => value === direction);
+    const char = foundEntry ? foundEntry[0] : null;
+    return char;
+}
+
 class Node {
-    private _input: string;
     public Direction: number;
     public Nodes: {
         North: null | Node,
@@ -26,16 +32,15 @@ class Node {
     };
     public Coor: Coor;
     public IsStart: boolean;
-    constructor(input: string) {
+    constructor(public Input: string) {
         this.Nodes = {
             North: null,
             South: null,
             East: null,
             West: null
         };
-        this._input = input;
-        this.Direction = CharToDirection.get(input) || 0;
-        if (input === 'S') {
+        this.Direction = CharToDirection.get(this.Input) || 0;
+        if (this.Input === 'S') {
             this.IsStart = true;
         }
     }
@@ -46,6 +51,14 @@ class Node {
                 return nextMaybe;
             }
         }
+    }
+    RedefineInput() {
+        let direction: Direction;
+        if (this.Nodes.North) direction |= Direction.North;
+        if (this.Nodes.South) direction |= Direction.South;
+        if (this.Nodes.East) direction |= Direction.East;
+        if (this.Nodes.West) direction |= Direction.West;
+        this.Input = directionToChar(direction);
     }
 }
 
@@ -96,6 +109,9 @@ const parse = (input: string) => {
             node.Coor = new Coor(x, y);
         });
     });
+
+    start.RedefineInput();
+
     return { parsed, start };
 };
 
@@ -115,6 +131,41 @@ const walk = (start: Node) => {
     return path;
 };
 
+const findInner = (parsed: Node[][], path: Node[]): number => {
+    // Find how many times we cross the path
+    // If the number of intersections is ODD, we're inside the path
+    let inner = 0;
+    parsed.forEach(row => {
+        let innerInRow = 0;
+        let count = 0;
+        let prevBend: Node | null = null;
+        row.forEach((node: Node) => {
+            if (path.includes(node)) {
+                // Did we cross?            
+                const cross = node.Input === '|' ||
+                    (prevBend?.Input === 'L' && node.Input === '7') ||
+                    (prevBend?.Input === 'F' && node.Input === 'J');
+                if (cross) {
+                    count++;
+                    prevBend = null;
+                    return;
+                }
+                // Did we start a new bend?
+                if (node.Input === 'L' || node.Input === 'F') {
+                    prevBend = node;
+                }
+                return;
+            }
+            if (count % 2 !== 0) {
+                innerInRow++;
+            }
+        });
+        inner += innerInRow;
+    });
+
+    return inner;
+}
+
 const part1 = async (input: string): Promise<number | string> => {
     const { parsed, start } = parse(input);
     const path = walk(start);
@@ -122,10 +173,9 @@ const part1 = async (input: string): Promise<number | string> => {
 };
 
 const part2 = async (input: string): Promise<number | string> => {
-    const parsed = parse(input);
-
-    return 0;
+    const { parsed, start } = parse(input);
+    const path = walk(start);
+    return findInner(parsed, path);
 };
 
 export { part1, part2 };
-

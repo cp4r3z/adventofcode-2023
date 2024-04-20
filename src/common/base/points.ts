@@ -37,7 +37,7 @@ export class XY implements IPoint2D {
         return this;
     }
 
-    toString = () => `x:${this.x}, y"${this.y}`;
+    toString = () => `x:${this.x}, y:${this.y}`;
 }
 
 export class XYZ implements IPoint3D {

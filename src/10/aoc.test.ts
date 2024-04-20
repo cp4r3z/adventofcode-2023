@@ -19,9 +19,9 @@ describe(`Day 10`, () => {
         console.log(solution);
     });
 
-    xit('Part 2', async () => {
-        const solution = await part2(tinput);
-        expect(solution).toBe(2);
+    it('Part 2', async () => {
+        const solution = await part2(tinput2);
+        expect(solution).toBe(10);
     });
 
     xit('Part 2 (Real Input)', async () => {
