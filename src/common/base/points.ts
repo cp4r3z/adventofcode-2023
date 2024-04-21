@@ -12,10 +12,13 @@ export class X implements IPoint1D {
 
     copy = () => new X(this.x);
     move = (delta: X) => { this.x += delta.x; }
-
 }
 
 export class XY implements IPoint2D {
+    static ManhattanDistance(a: XY, b: XY): number {
+        return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+    }
+
     x: number;
     y: number;
 

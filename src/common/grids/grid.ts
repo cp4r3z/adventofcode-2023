@@ -1,16 +1,16 @@
-import * as Points from "./base/points";
-import * as Shapes from "./base/shapes";
+import * as Points from "../base/points";
+import * as Shapes from "../base/shapes";
 
 export type GridOptions = {
     setOnGet: boolean,
     defaultValue: any
 }
 
-export class Grid2D extends Map<string, any>{
+export class Grid2D extends Map<string, any> {
     static HashPointToKey = (p: Points.IPoint2D): string => `X${p.x}Y${p.y}`; // maybe do some validation?
     static HashXYToKey = (x: number, y: number): string => `X${x}Y${y}`;
 
-    private bounds: Shapes.Rectangle = null;
+    protected bounds: Shapes.Rectangle = null;
 
     private readonly options: GridOptions = {
         setOnGet: true,
@@ -20,6 +20,11 @@ export class Grid2D extends Map<string, any>{
     constructor(options?: GridOptions) {
         super();
         if (options) this.options = options;
+    }
+
+    clear() {
+        super.clear();
+        this.bounds = null;
     }
 
     // TODO: delete, has
@@ -37,7 +42,7 @@ export class Grid2D extends Map<string, any>{
             }
         }
         return value;
-    }
+    };
 
     setPoint = (point: Points.IPoint2D, value: any): void => {
         if (!this.bounds) {
@@ -63,6 +68,12 @@ export class Grid2D extends Map<string, any>{
         }
 
         this.set(hash, value);
+    };
+
+    getValueArray() {
+        const mapArr = [...this]; // array of arrays
+        const valArr = mapArr.map(([key, value]) => value);
+        return valArr;
     }
 
     getBounds = () => this.bounds;
@@ -90,45 +101,38 @@ export class Grid2D extends Map<string, any>{
     }
 
     print = (yDown = true) => {
-        if (yDown) { // TODO: DRY this up
-            for (let y = this.bounds.minY; y <= this.bounds.maxY; y++) {
-                let line = '';
-                for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
-                    const key = Grid2D.HashXYToKey(x, y);
-                    let value = this.get(key);
-                    if (typeof (value) === 'undefined') {
-                        value = null;
-                        if (this.options.setOnGet) {
-                            value = this.options.defaultValue;
-                            this.set(key, this.options.defaultValue);
-                        }
+
+        const printLine = (y: number) => {
+            let line = '';
+            for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
+                const key = Grid2D.HashXYToKey(x, y);
+                let value = this.get(key);
+                if (typeof (value) === 'undefined') {
+                    value = this.options.defaultValue;
+                    if (this.options.setOnGet) {
+                        this.set(key, value);
                     }
-                                        line += value;
+                } else if (value?.print) {
+                    value = value.print();
                 }
-                console.log(line);
+                line += value;
             }
-                    } else {
+            console.log(line);
+        }
+
+        if (yDown) {
+            for (let y = this.bounds.minY; y <= this.bounds.maxY; y++) {
+                printLine(y);
+            }
+        } else {
             for (let y = this.bounds.maxY; y >= this.bounds.minY; y--) {
-                let line = '';
-                for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
-                    const key = Grid2D.HashXYToKey(x, y);
-                    let value = this.get(key);
-                    if (typeof (value) === 'undefined') {
-                        value = null;
-                        if (this.options.setOnGet) {
-                            value = this.options.defaultValue;
-                            this.set(key, this.options.defaultValue);
-                        }
-                    }
-                    line += value;
-                }
-                console.log(line);
+                printLine(y);
             }
         }
     }
 }
 
-export class Grid3D extends Map<string, any>{
+export class Grid3D extends Map<string, any> {
     static HashPointToKey = (p: Points.IPoint3D): string => `X${p.x}Y${p.y}Z${p.z}`; // maybe do some validation?
     static HashXYToKey = (x: number, y: number, z: number): string => `X${x}Y${y}Z${z}`;
     static HashToPoint = (h: string): Points.IPoint3D => {

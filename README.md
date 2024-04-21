@@ -10,7 +10,11 @@ https://adventofcode.com/2023
 
 Brute force solution found on the day, but a performant solution took... a long time.
 Involves Intervals, for which a common module was built with unit tests.
-The solution Intersection of Intervals into a tree structure, and then traversing for a min value.
+The solution involves an "Intersection of **Intervals**" into a tree-LIKE graph, and then traversing for a min value.
+
+## Day 11
+
+**Grid2D** with Manhattan distances. The main difficulty was debugging the "universe expansion" OBO errors.
 
 # Setup
 
