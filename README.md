@@ -7,14 +7,15 @@ https://adventofcode.com/2023
 # Notables
 
 ## Day 5
-
 Brute force solution found on the day, but a performant solution took... a long time.
 Involves Intervals, for which a common module was built with unit tests.
 The solution involves an "Intersection of **Intervals**" into a tree-LIKE graph, and then traversing for a min value.
 
 ## Day 11
-
 **Grid2D** with Manhattan distances. The main difficulty was debugging the "universe expansion" OBO errors.
+
+## Day 12
+Combinations problem solved using dynamic programming, caching / memoizing results. Unfortunately Part 2 took something like 7.5 minutes, mostly due to input 850 (all ?s) It would be good to revisit.
 
 # Setup
 

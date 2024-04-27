@@ -17,17 +17,17 @@ type FindObj = {
     groups: number[],
     allPossible: string[],
     numberOfArrangements: number, // The length of allPossible
-    reIsPossible: RegExp,    
-    //memo: Map<string, string[]>
+    reIsPossible: RegExp,
+    //memo: Map<string, string[]> // Previously we stored all the actual strings
     memo: Map<string, number>
 }
 
 const _findPossible = (findObj: FindObj) => {
 
     let memoKey: string = null;
-    const groupKey=findObj.groups.join('g');
+    const groupKey = findObj.groups.join('g');
     memoKey = `g${groupKey}s${findObj.s}`;
-    
+
     if (findObj.memo.has(memoKey)) {
         const memoized = findObj.memo.get(memoKey);
         //findObj.allPossible = memoized;
@@ -39,7 +39,7 @@ const _findPossible = (findObj: FindObj) => {
         return;
     }
 
- // What's the total possible number of # left
+    // What's the total possible number of # left
     // This doesn't seem to help much
     // const possibleDamaged = findObj.s.split('').filter(s => { return s === '#' || s === '?' }).length;
     // const totalDamaged = findObj.groups.reduce((prev, g) => { return prev + g }, 0);
@@ -55,56 +55,35 @@ const _findPossible = (findObj: FindObj) => {
         return;
     }
 
-    //let indexOfDotQ = findObj.s.indexOf('.?');
-    let indexOfDotQ = findObj.s.match(/(?<!\?.*)(\.\?)/)?.index ?? -1;
+    const indexOfDotQ = findObj.s.match(/(?<!\?.*)(\.\?)/)?.index ?? -1;
 
-
-    
     const remainingGroups = findObj.groups.map(n => n);
     if (indexOfDotQ > -1) {
         const damagedCount = findObj.s.substring(0, indexOfDotQ).match(/#/g)?.length ?? 0;
-       
         let total = 0;
         while (total < damagedCount) {
             total += remainingGroups.shift();
         }
-        if (damagedCount > 0) {
-            // console.log('damagedCount>0');
-        }
-    } 
-
-    
-    //console.log(`Good`);
+    }
 
     // What's the total possible number of # left
     // This doesn't seem to help
-    const possibleDamaged = findObj.s.split('').filter(s => { return s === '#' || s === '?' }).length;
-    const totalDamaged = findObj.groups.reduce((prev, g) => { return prev + g }, 0);
-    if (possibleDamaged < totalDamaged) {
-        return;
-    }
-
-    // What if we look for the first instance of .?
-
-    // everything before it
-    // how many groups did we find
-
-    // everything after it
-    // presumably identical to all other instances?
-
-    // memo: groups found, XXXXXXXXXXXX.? <- or just the length to the first instance?
+    // const possibleDamaged = findObj.s.split('').filter(s => { return s === '#' || s === '?' }).length;
+    // const totalDamaged = findObj.groups.reduce((prev, g) => { return prev + g }, 0);
+    // if (possibleDamaged < totalDamaged) {
+    //     return;
+    // }
 
     const firstUnknown = findObj.s.indexOf('?');
     if (firstUnknown === -1) {
-       // findObj.allPossible.push(findObj.s); // this isn't "all possible"
+        // findObj.allPossible.push(findObj.s); // this isn't "all possible"
         findObj.numberOfArrangements++;
 
         // Memoizing here doesn't really help much.
-        if (memoKey){
-            findObj.memo.set(memoKey,1);
+        if (memoKey) {
+            findObj.memo.set(memoKey, 1);
         }
 
-        //console.log(findObj.s);
         return;
     }
 
@@ -129,7 +108,7 @@ const _findPossible = (findObj: FindObj) => {
             sPrefix: sPrefix,
             groups: remainingGroups,
             allPossible: nextPossibles,
-            numberOfArrangements:0,
+            numberOfArrangements: 0,
             reIsPossible: findObj.reIsPossible,
             memo: findObj.memo
         };
@@ -138,16 +117,16 @@ const _findPossible = (findObj: FindObj) => {
         // for (const n of nextPossibles) {
         //     // console.log(`push ${sPrefixThisOne} + ${n}`);
         //     findObj.allPossible.push(sPrefixThisOne + n);
-            
-        // }
-        nextNumberOfArrangements+= next.numberOfArrangements;
-    });
-    findObj.numberOfArrangements+=nextNumberOfArrangements;
 
-    if (memoKey){
-        findObj.memo.set(memoKey,nextNumberOfArrangements);
+        // }
+        nextNumberOfArrangements += next.numberOfArrangements;
+    });
+    findObj.numberOfArrangements += nextNumberOfArrangements;
+
+    if (memoKey) {
+        findObj.memo.set(memoKey, nextNumberOfArrangements);
     }
-    
+
 };
 
 const buildRegEx = (groups: number[]) => {
@@ -181,7 +160,7 @@ const findPossible = (s: string, groups: number[]) => {
     //const memo = new Map<string, string[]>();
     const memo = new Map<string, number>();
 
-    const allPossible:string[] = [];
+    const allPossible: string[] = [];
 
     const sPrefix = ""; // For part 2
     const findObj = {
@@ -189,7 +168,7 @@ const findPossible = (s: string, groups: number[]) => {
         sPrefix,
         groups,
         allPossible,
-        numberOfArrangements:0,
+        numberOfArrangements: 0,
         reIsPossible,
         memo
     };
@@ -213,8 +192,8 @@ const part2 = async (input: string): Promise<number | string> => {
     const { parsed } = parse(input);
 
     const sumOfArrangements = parsed.reduce((prev, p, i, arr) => {
-        console.log(`Processing ${i + 1} of ${arr.length}`);
-        
+        //console.log(`Processing ${i + 1} of ${arr.length}`);
+
         const s5 = new Array(5).fill(p.springs).join('?');
         let g5 = [];
         for (let i = 0; i < 5; i++) {
