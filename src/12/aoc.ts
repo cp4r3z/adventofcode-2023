@@ -22,40 +22,27 @@ type FindObj = {
 
 const _findPossible = (findObj: FindObj) => {
 
-    //let indexOfDotQ = findObj.s.indexOf('.?');
-    let indexOfDotQ = findObj.s.match(/(?<!\?.*)(\.\?)/)?.index ?? -1;
-
-
     let memoKey: string = null;
-    const remainingGroups = findObj.groups.map(n => n);
-    if (indexOfDotQ > -1) {
-        const damagedCount = findObj.s.substring(0, indexOfDotQ).match(/#/g)?.length ?? 0;
-        memoKey = `d${damagedCount}i${indexOfDotQ}`;
-        if (findObj.memo.has(memoKey)) {
-            const memoized = findObj.memo.get(memoKey);
-            findObj.allPossible = memoized;
-            return;
+    const groupKey=findObj.groups.join('g');
+    memoKey = `g${groupKey}s${findObj.s}`;
+    
+    if (findObj.memo.has(memoKey)) {
+        const memoized = findObj.memo.get(memoKey);
+        //findObj.allPossible = memoized;
+        for (const m of memoized) {
+            findObj.allPossible.push(m);
         }
-
-        // maybe here find the suffix / prefix and groups?
-
-        // const totalDamaged = findObj.groups.reduce((p, c) => p + c, 0);
-        // const remainingCount = totalDamaged - damagedCount;        
-        //let i = findObj.groups.length - 1;
-
-        let total = 0;
-        while (total < damagedCount) {
-            total += remainingGroups.shift();
-        }
-        if (damagedCount > 0) {
-            // console.log('damagedCount>0');
-        }
-
-
-
-    } else {
-        // indexOfDotQ = 0;
+        //console.log('Used memo');
+        return;
     }
+
+ // What's the total possible number of # left
+    // This doesn't seem to help much
+    // const possibleDamaged = findObj.s.split('').filter(s => { return s === '#' || s === '?' }).length;
+    // const totalDamaged = findObj.groups.reduce((prev, g) => { return prev + g }, 0);
+    // if (possibleDamaged < totalDamaged) {
+    //     return;
+    // }
 
     const fullString = findObj.sPrefix + findObj.s;
 
@@ -64,6 +51,26 @@ const _findPossible = (findObj: FindObj) => {
         //console.log(`Bad`);
         return;
     }
+
+    //let indexOfDotQ = findObj.s.indexOf('.?');
+    let indexOfDotQ = findObj.s.match(/(?<!\?.*)(\.\?)/)?.index ?? -1;
+
+
+    
+    const remainingGroups = findObj.groups.map(n => n);
+    if (indexOfDotQ > -1) {
+        const damagedCount = findObj.s.substring(0, indexOfDotQ).match(/#/g)?.length ?? 0;
+       
+        let total = 0;
+        while (total < damagedCount) {
+            total += remainingGroups.shift();
+        }
+        if (damagedCount > 0) {
+            // console.log('damagedCount>0');
+        }
+    } 
+
+    
     //console.log(`Good`);
 
     // What's the total possible number of # left
@@ -120,11 +127,14 @@ const _findPossible = (findObj: FindObj) => {
 
         for (const n of nextPossibles) {
             // console.log(`push ${sPrefixThisOne} + ${n}`);
-            findObj.allPossible.push(sPrefixThisOne + n);
+            findObj.allPossible. push(sPrefixThisOne + n);
         }
     });
 
-   // findObj.memo.set(memoKey,findObj.allPossible);
+    if (memoKey){
+        findObj.memo.set(memoKey,findObj.allPossible);
+    }
+    
 };
 
 const buildRegEx = (groups: number[]) => {

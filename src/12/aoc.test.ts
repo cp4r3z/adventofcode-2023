@@ -14,12 +14,12 @@ describe(`Day 12`, () => {
         expect(solution).toBe(21);
     });
 
-    it('Part 1 (Real Input)', async () => {
+    xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
         console.log(solution);
     });
 
-    xit('Part 2', async () => {
+    it('Part 2', async () => {
         const solution = await part2(tinput);
         expect(solution).toBe(525152);
     });
