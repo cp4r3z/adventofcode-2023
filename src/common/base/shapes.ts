@@ -130,7 +130,7 @@ export class Rectangle {
     }
 
     // How is this different from contains?
-    hasPoint = (coor: Point.XY): Boolean => {
+    hasPoint = (coor: Point.IPoint2D): boolean => {
         return (
             coor.x >= this._x0y0.x && coor.x <= this._x1y1.x &&
             coor.y >= this._x0y0.y && coor.y <= this._x1y1.y

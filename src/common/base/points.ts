@@ -32,7 +32,7 @@ export class XY implements IPoint2D {
     /**
      * AKA "Add"
      */
-    move = (delta: XY | null) => {
+    move = (delta: IPoint2D | null) => {
         if (delta) {
             this.x += delta.x;
             this.y += delta.y;
