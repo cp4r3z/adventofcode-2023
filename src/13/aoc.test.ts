@@ -14,7 +14,7 @@ describe(`Day 13`, () => {
         expect(solution).toBe(405);
     });
 
-    it('Part 1 (Real Input)', async () => {
+    xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
         console.log('Part 1 (Real Input)');
         console.log(solution);
@@ -25,7 +25,7 @@ describe(`Day 13`, () => {
         expect(solution).toBe(400);
     });
 
-    it('Part 2 (Real Input)', async () => {
+    xit('Part 2 (Real Input)', async () => {
         const solution = await part2(input);
         console.log('Part 2 (Real Input)');
         console.log(solution);

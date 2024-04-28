@@ -18,16 +18,6 @@ const parse = (input: string) => {
     return { parsed };
 };
 
-// const convertToNumber = (s: string) => {
-//     let num = 0;
-//     s.split('').forEach((_s, i) => {
-//         if (_s === "#") {
-//             num += Math.pow(2, i);
-//         }
-//     });
-//     return num;
-// };
-
 const offByOne = (s1: string, s2: string) => {
     // assuming they're the same size
     // also assume they're not equal
@@ -40,7 +30,6 @@ const offByOne = (s1: string, s2: string) => {
                 firstMismatch = true;
             }
         }
-
     }
     return true;
 }
@@ -74,16 +63,16 @@ const findMirrorIndex = (sArr: string[], allowSmudge = false) => {
             iLow--;
             iHigh++;
             if (iLow < 0 || iHigh > sArr.length - 1) {
-                console.log(`smudgeCorrected=${data.smudgeCorrected}`);
+               // console.log(`smudgeCorrected=${data.smudgeCorrected}`);
                 if (allowSmudge) {
                     if (data.smudgeCorrected) {
                         return i + 1; // Because array starts at 1                                        
-                    } else{
-                      break;
+                    } else {
+                        break;
                     }
                 } else {
                     return i + 1; // Because array starts at 1                
-                }               
+                }
             }
             data.sLow = sArr[iLow];
             data.sHigh = sArr[iHigh];
@@ -95,14 +84,10 @@ const findMirrorIndex = (sArr: string[], allowSmudge = false) => {
 const part1 = async (input: string): Promise<number | string> => {
     const { parsed } = parse(input);
 
-    const answer = parsed.reduce((prev, cur, i) => {
-        console.log(`\nGrid ${i}\n`);
+    const answer = parsed.reduce((prev, cur) => {
         let current = findMirrorIndex(cur.rows) * 100;
         if (current === 0) {
             current = findMirrorIndex(cur.cols);
-            console.log(`Vertical Index = ${current}`);
-        } else {
-            console.log(`Horizontal Index = ${current / 100}`);
         }
         return prev + current;
     }, 0);
@@ -113,14 +98,10 @@ const part1 = async (input: string): Promise<number | string> => {
 const part2 = async (input: string): Promise<number | string> => {
     const { parsed } = parse(input);
 
-    const answer = parsed.reduce((prev, cur, i) => {
-        console.log(`\nGrid ${i}\n`);
+    const answer = parsed.reduce((prev, cur) => {
         let current = findMirrorIndex(cur.rows, true) * 100;
         if (current === 0) {
             current = findMirrorIndex(cur.cols, true);
-            console.log(`Vertical Index = ${current}`);
-        } else {
-            console.log(`Horizontal Index = ${current / 100}`);
         }
         return prev + current;
     }, 0);
@@ -129,4 +110,3 @@ const part2 = async (input: string): Promise<number | string> => {
 };
 
 export { part1, part2 };
-
