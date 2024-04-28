@@ -6,6 +6,24 @@ export type GridOptions = {
     defaultValue: any
 }
 
+export module Direction {
+    export enum Cardinal {
+        North = 1 << 0, // 1
+        South = 1 << 1, // 2
+        West = 1 << 2, // 4
+        East = 1 << 3, // 8
+    };
+
+    export const CardinalToXY: Map<Cardinal, Points.IPoint2D> = new Map<Cardinal, Points.XY>();
+    // Y Down
+    CardinalToXY.set(Cardinal.North, new Points.XY(0, -1));
+    CardinalToXY.set(Cardinal.South, new Points.XY(0, 1));
+    CardinalToXY.set(Cardinal.West, new Points.XY(-1, 0));
+    CardinalToXY.set(Cardinal.East, new Points.XY(1, 0));
+
+    // Up Down Right Left
+}
+
 export class Grid2D extends Map<string, any> {
     static HashPointToKey = (p: Points.IPoint2D): string => `X${p.x}Y${p.y}`; // maybe do some validation?
     static HashXYToKey = (x: number, y: number): string => `X${x}Y${y}`;
@@ -70,6 +88,18 @@ export class Grid2D extends Map<string, any> {
         this.set(hash, value);
     };
 
+    // Returns the value at the deleted key (point)
+    deletePoint = (point: Points.IPoint2D): any => {
+        const hash: string = Grid2D.HashPointToKey(point);
+        let value: any = this.get(hash);
+        if (!value){
+            return null;
+        }
+        this.delete(hash);
+        //console.warn('TODO: Optionally Update Bounds');
+        return value;
+    };
+
     getValueArray() {
         const mapArr = [...this]; // array of arrays
         const valArr = mapArr.map(([key, value]) => value);
@@ -77,6 +107,10 @@ export class Grid2D extends Map<string, any> {
     }
 
     getBounds = () => this.bounds;
+
+    inBounds = (p:Points.IPoint2D):boolean=>{
+        return this.bounds.hasPoint(p);
+    }
 
     hash = () => {
         // maybe find something smaller?
