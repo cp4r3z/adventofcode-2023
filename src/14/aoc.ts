@@ -29,7 +29,7 @@ class Dish extends Grid2D {
             .sort((a: Rock, b: Rock) => {
                 return dirXY.y * (b.y - a.y) + dirXY.x * (b.x - a.x);
             });
-        
+
         // Now for each sorted, move as far as you can in the direction
         // To move, delete it from the map and then re-add with the correct 
         sorted.forEach((r: Rock) => {
@@ -49,11 +49,10 @@ class Dish extends Grid2D {
         return this.getValueArray()
             .filter((r: Rock) => r.Type === RockType.Round)
             .reduce((prev, cur: Rock) => {
-                const distanceToSouthEdge = this.bounds.maxY - cur.y + 1;// Starts at 1
-                return prev+distanceToSouthEdge;
-            }, 0);        
+                const distanceToSouthEdge = this.bounds.maxY - cur.y + 1; // Starts at 1
+                return prev + distanceToSouthEdge;
+            }, 0);
     }
-
 }
 
 const parse = (input: string) => {
@@ -82,7 +81,6 @@ const parse = (input: string) => {
 const part1 = async (input: string): Promise<number | string> => {
     const { parsed, dish } = parse(input);
     //dish.print();
-    //console.log('tilt\n');
     dish.tilt();
     //dish.print();
 
@@ -93,9 +91,39 @@ const part1 = async (input: string): Promise<number | string> => {
 const part2 = async (input: string): Promise<number | string> => {
     const { parsed, dish } = parse(input);
     //dish.print();
-    //console.log('tilt\n');
-    dish.tilt();
-    //dish.print();
+
+    // Use crypto hash
+    const useCrypto = true; // Otherwise human-readable
+    const history = [dish.hash(useCrypto)];
+    let repeatFound = false;
+    let remainingAfterFound = 1;
+
+    while (remainingAfterFound > 0) {
+
+        // Cycle
+        dish.tilt(D.North);
+        dish.tilt(D.West);
+        dish.tilt(D.South);
+        dish.tilt(D.East);
+
+        //console.log(`\nAfter Cycle: ${history.length}\n`);
+        //dish.print();
+
+        if (repeatFound) {
+            remainingAfterFound--;
+            continue;
+        }
+
+        const hash = dish.hash(useCrypto);
+        const previousIndex = history.indexOf(hash);
+        if (previousIndex > -1) {
+            repeatFound = true;
+            const interval = history.length - previousIndex; // we haven't added it yet
+            remainingAfterFound = (1000000000 - history.length) % interval;
+        } else {
+            history.push(hash);
+        }
+    }
 
     const solution = dish.getLoad();
     return solution;

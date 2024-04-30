@@ -1,5 +1,6 @@
 import * as Points from "../base/points";
 import * as Shapes from "../base/shapes";
+const { createHash } = await import('node:crypto');
 
 export type GridOptions = {
     setOnGet: boolean,
@@ -92,7 +93,7 @@ export class Grid2D extends Map<string, any> {
     deletePoint = (point: Points.IPoint2D): any => {
         const hash: string = Grid2D.HashPointToKey(point);
         let value: any = this.get(hash);
-        if (!value){
+        if (!value) {
             return null;
         }
         this.delete(hash);
@@ -108,11 +109,12 @@ export class Grid2D extends Map<string, any> {
 
     getBounds = () => this.bounds;
 
-    inBounds = (p:Points.IPoint2D):boolean=>{
+    inBounds = (p: Points.IPoint2D): boolean => {
         return this.bounds.hasPoint(p);
     }
 
-    hash = () => {
+    // Deprecated
+    hashOld = () => {
         // maybe find something smaller?
         let hash = '';
         for (let y = this.bounds.minY; y <= this.bounds.maxY; y++) {
@@ -132,6 +134,30 @@ export class Grid2D extends Map<string, any> {
             }
         }
         return hash;
+    }
+
+    hash = (useCrypto: boolean = true) => {
+        let hash = '';
+        for (let [k, v] of this.entries()) {
+            hash += `k${k}`;
+            //console.log(k, v);
+            if (typeof v === 'string') {
+                hash += `v${v}`;
+            } else if (v.print) {
+                hash += `v${v.print()}`;
+            } else if (v.toString) {
+                hash += `v${v.toString()}`;
+            } else {
+                hash += `v${v}`;
+            }
+        }
+        if (!useCrypto) {
+            return hash;
+        }
+
+        const cryptoHash = createHash('sha1');
+        const digest = cryptoHash.update(hash).digest('base64');
+        return digest;
     }
 
     print = (yDown = true) => {
