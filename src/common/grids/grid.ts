@@ -15,6 +15,13 @@ export module Direction {
         East = 1 << 3, // 8
     };
 
+    export const Cardinals: Cardinal[] = [
+        Cardinal.North,
+        Cardinal.East,
+        Cardinal.South,
+        Cardinal.West
+    ];
+
     export const CardinalToXY: Map<Cardinal, Points.IPoint2D> = new Map<Cardinal, Points.XY>();
     // Y Down
     CardinalToXY.set(Cardinal.North, new Points.XY(0, -1));
@@ -108,6 +115,21 @@ export class Grid2D extends Map<string, any> {
     }
 
     getBounds = () => this.bounds;
+
+    getEdgePoints = (): Points.IPoint2D[] => {
+        const points: Points.IPoint2D[] = [];
+        // Top & Bottom
+        for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
+            points.push(new Points.XY(x, this.bounds.minY));
+            points.push(new Points.XY(x, this.bounds.maxY));
+        }
+        // Left & Right
+        for (let y = this.bounds.minY + 1; y < this.bounds.maxY; y++) {
+            points.push(new Points.XY(this.bounds.minX, y));
+            points.push(new Points.XY(this.bounds.maxX, y));
+        }
+        return points;
+    }
 
     inBounds = (p: Points.IPoint2D): boolean => {
         return this.bounds.hasPoint(p);

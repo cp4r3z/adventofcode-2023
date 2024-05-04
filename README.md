@@ -17,6 +17,9 @@ The solution involves an "Intersection of **Intervals**" into a tree-LIKE graph,
 ## Day 12
 Combinations problem solved using dynamic programming, caching / memoizing results. Unfortunately Part 2 took something like 7.5 minutes, mostly due to input 850 (all ?s) It would be good to revisit.
 
+## Day 16
+**Grid2D** with some custom logic for elements. Used an abstract class for the shared logic. Part 2 solution ran a bit slow for the real input.
+
 # Setup
 
 ## Building

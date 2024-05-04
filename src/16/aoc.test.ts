@@ -14,15 +14,15 @@ describe(`Day 16`, () => {
         expect(solution).toBe(46);
     });
 
-    it('Part 1 (Real Input)', async () => {
+    xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
         console.log('Part 1 (Real Input)');
         console.log(solution);
     });
 
-    xit('Part 2', async () => {
+    it('Part 2', async () => {
         const solution = await part2(tinput);
-        expect(solution).toBe(64);
+        expect(solution).toBe(51);
     });
 
     xit('Part 2 (Real Input)', async () => {

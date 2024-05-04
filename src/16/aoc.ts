@@ -11,31 +11,23 @@ interface ISpace extends IPoint2D {
 
 abstract class Space extends XY implements ISpace {
     // Maintain a history of beams passing through
-    public BeamHistory: Map<D, boolean>
+    public BeamHistory: number; // Use enums as bitwise true/false
     public S: string;
     constructor(x: number, y: number, s: string) {
         super(x, y);
         this.S = s;
-        this.BeamHistory = new Map<D, boolean>;
-        this.BeamHistory.set(D.North, false);
-        this.BeamHistory.set(D.East, false);
-        this.BeamHistory.set(D.South, false);
-        this.BeamHistory.set(D.West, false);
+        this.BeamHistory = 0;
     }
     print() { return `${this.S}`; }
     emit(b: Beam) { return []; }
-    // record(b:Beam){
-    //     if (this.BeamHistory.get(b.D)) {
-    //         return []; // We've already been here
-    //     }
-    //     this.BeamHistory.set(b.D, true);
-    // }
-    isEnergized(): boolean {
-        if (this.BeamHistory.get(D.North) === true) return true;
-        if (this.BeamHistory.get(D.East) === true) return true;
-        if (this.BeamHistory.get(D.South) === true) return true;
-        if (this.BeamHistory.get(D.West) === true) return true;
+    // Returns true if already recorded
+    record(b: Beam) {
+        if (this.BeamHistory & b.D) return true;
+        this.BeamHistory = this.BeamHistory | b.D;
         return false;
+    }
+    isEnergized(): boolean {
+        return this.BeamHistory > 0;
     }
 }
 
@@ -44,10 +36,7 @@ class Splitter extends Space {
         super(x, y, s);
     }
     emit(b: Beam) {
-        if (this.BeamHistory.get(b.D)) {
-            return []; // We've already been here
-        }
-        this.BeamHistory.set(b.D, true);
+        if (this.record(b)) return [];
 
         if (this.S === '-') {
             if (b.D === D.East || b.D === D.West) {
@@ -71,29 +60,19 @@ class Mirror extends Space {
         super(x, y, s);
     }
     emit(b: Beam) {
-        if (this.BeamHistory.get(b.D)) {
-            return []; // We've already been here
-        }
-        this.BeamHistory.set(b.D, true);
-
+        if (this.record(b)) return [];
         return [b.reflect(this.S)];
     }
 }
 
 class EmptySpace extends Space {
-
     constructor(x: number, y: number, s: string) {
         super(x, y, s);
     }
     emit(b: Beam) {
-        if (this.BeamHistory.get(b.D)) {
-            return []; // We've already been here
-        }
-        this.BeamHistory.set(b.D, true);
-
+        if (this.record(b)) return [];
         return [b.next()];
     }
-
 }
 
 class Beam extends XY {
@@ -172,7 +151,7 @@ class Contraption extends Grid2D {
         this.Beams.forEach(beam => {
             const nextSpace = this.getPoint(beam);
             if (!nextSpace) {
-                return; // sh9uldn't happen right?
+                return; // shouldn't happen right?
             }
             const emitted = nextSpace.emit(beam);
             emitted.forEach((e: Beam) => {
@@ -215,7 +194,6 @@ class Contraption extends Grid2D {
             }
         }
     }
-
 }
 
 const parse = (input: string) => {
@@ -242,7 +220,7 @@ const parse = (input: string) => {
 const part1 = async (input: string): Promise<number | string> => {
     const { parsed, contraption } = parse(input);
     //contraption.print();
-    
+
     // Initial Beam
     const initialBeam = new Beam(0, 0, D.East);
     contraption.Beams.push(initialBeam);
@@ -253,21 +231,46 @@ const part1 = async (input: string): Promise<number | string> => {
         // contraption.print();
     }
     const solution = contraption.getValueArray()
-        .filter((space: ISpace) => space.isEnergized()).length;
+        .filter((space: ISpace) => space.isEnergized())
+        .length;
     return solution;
 };
 
 const part2 = async (input: string): Promise<number | string> => {
     const { parsed, contraption } = parse(input);
     //contraption.print();
-    while (contraption.Beams.length) {
-        contraption.emitBeams();
-        // console.log();
-        // contraption.print();
-    }
-    const solution = contraption.getValueArray()
-        .filter((space: ISpace) => space.isEnergized()).length;
-    return solution;
+
+    const startingBeams: Beam[] = [];
+    contraption.getEdgePoints().forEach(p => {
+        // This is testing more than it should.
+        // We should probably create a custom getEdgePoints
+        Direction.Cardinals.forEach((d: D) => {
+            startingBeams.push(new Beam(p.x, p.y, d));
+        });
+    });
+
+    let max = 0;
+    //let initialI = 0;
+    startingBeams.forEach(initialBeam => {
+        // console.log(`Attempt: ${initialI}/${startingBeams.length}`);
+        // initialI++;
+
+        // Re-parsing is wasting a lot of time.
+        const { parsed, contraption } = parse(input);
+        //contraption.print();    
+        contraption.Beams.push(initialBeam);
+        while (contraption.Beams.length) {
+            contraption.emitBeams();
+        }
+        const subSolution = contraption.getValueArray()
+            .filter((space: ISpace) => space.isEnergized())
+            .length;
+
+        if (subSolution > max) {
+            max = subSolution;
+        }
+    });
+    return max;
 };
 
 export { part1, part2 };
