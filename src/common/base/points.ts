@@ -19,6 +19,10 @@ export class XY implements IPoint2D {
         return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
     }
 
+    static AreEqual(a: XY, b: XY): boolean {
+        return a.x === b.x && a.y === b.y;
+    }
+
     x: number;
     y: number;
 
