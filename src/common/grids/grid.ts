@@ -2,9 +2,17 @@ import * as Points from "../base/points";
 import * as Shapes from "../base/shapes";
 const { createHash } = await import('node:crypto');
 
+export interface IGrid2D {
+    //TODO
+}
+
 export type GridOptions = {
     setOnGet: boolean,
     defaultValue: any
+}
+
+export type String2DOptions = {
+    parseInt: boolean
 }
 
 export module Direction {
@@ -28,13 +36,56 @@ export module Direction {
     CardinalToXY.set(Cardinal.South, new Points.XY(0, 1));
     CardinalToXY.set(Cardinal.West, new Points.XY(-1, 0));
     CardinalToXY.set(Cardinal.East, new Points.XY(1, 0));
+    // TODO: Up Down Right Left?
 
-    // Up Down Right Left
+    export class Obj {
+        public Left: Obj;
+        public Right: Obj;
+        public XY: Points.IPoint2D;
+        constructor(public Cardinal: Cardinal) {
+            this.XY = CardinalToXY.get(this.Cardinal);
+        }
+    }
+
+    export const getDirectionObjs = () => {
+        const North = new Obj(Cardinal.North);
+        const East = new Obj(Cardinal.East);
+        const South = new Obj(Cardinal.South);
+        const West = new Obj(Cardinal.West);
+        North.Left = West; North.Right = East;
+        East.Left = North; East.Right = South;
+        South.Left = East; South.Right = West;
+        West.Left = South; West.Right = North;
+        return { North, East, South, West };
+    }
+
+    export const Back = (c: Cardinal): Cardinal => {
+        if (c === Cardinal.North) return Cardinal.South;
+        if (c === Cardinal.East) return Cardinal.West;
+        if (c === Cardinal.South) return Cardinal.North;
+        if (c === Cardinal.West) return Cardinal.East;
+        console.error('Bad Input');
+    }
 }
 
+export class GridPoint extends Points.XY {
+    public Value: any;
+    constructor(x: number, y: number, value: any) {
+        super(x, y);
+        this.Value = value;
+    }
+    print() { return this.Value; }
+}
+
+// Warning: Do not use the native Map set() function
 export class Grid2D extends Map<string, any> {
-    static HashPointToKey = (p: Points.IPoint2D): string => `X${p.x}Y${p.y}`; // maybe do some validation?
+    static HashPointToKey = (p: Points.IPoint2D): string => Grid2D.HashXYToKey(p.x, p.y);  //`X${p.x}Y${p.y}`; // maybe do some validation?
     static HashXYToKey = (x: number, y: number): string => `X${x}Y${y}`;
+    static ReKey: RegExp = new RegExp(/([\-\d]+)/, 'g');
+    static HashKeyToXY = (hash: string): Points.IPoint2D => {
+        const matches = hash.match(Grid2D.ReKey);
+        return new Points.XY(parseInt(matches[0]), parseInt(matches[1]));
+    }
 
     protected bounds: Shapes.Rectangle = null;
 
@@ -70,6 +121,8 @@ export class Grid2D extends Map<string, any> {
         return value;
     };
 
+    setGridPoint = (point: GridPoint): void => this.setPoint(point, point);
+
     setPoint = (point: Points.IPoint2D, value: any): void => {
         if (!this.bounds) {
             // Should only happen once
@@ -94,6 +147,42 @@ export class Grid2D extends Map<string, any> {
         }
 
         this.set(hash, value);
+    };
+
+
+    getPointNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
+        const neighbors = [];
+
+        for (const c of Direction.Cardinals) {
+            const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
+            const neighbor: Points.IPoint2D = point.copy().move(xy);
+            const p = this.getPoint(neighbor);
+            if (this.bounds.hasPoint(p)) {
+                neighbors.push(p);
+            }
+
+        }
+        return neighbors;
+    }
+
+    // TODO: SetFrom2DString, but give it a type?
+
+    /**
+     * Assumes that this is a string representing a grid.
+     * Rows are separated by returns \n
+     */
+    setFromString2D = (input: string, options?: String2DOptions) => {
+        input
+            .split('\n')
+            .forEach((row, y) => {
+                row.split('').forEach((s, x) => {
+                    let val: any = s;
+                    if (options?.parseInt) {
+                        val = parseInt(s);
+                    }
+                    this.setGridPoint(new GridPoint(x, y, val));
+                });
+            });
     };
 
     // Returns the value at the deleted key (point)
@@ -134,6 +223,7 @@ export class Grid2D extends Map<string, any> {
     inBounds = (p: Points.IPoint2D): boolean => {
         return this.bounds.hasPoint(p);
     }
+
 
     // Deprecated
     hashOld = () => {

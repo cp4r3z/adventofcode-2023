@@ -15,12 +15,16 @@ export class X implements IPoint1D {
 }
 
 export class XY implements IPoint2D {
-    static ManhattanDistance(a: XY, b: XY): number {
+    static ManhattanDistance(a: IPoint2D, b: IPoint2D): number {
         return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
     }
 
-    static AreEqual(a: XY, b: XY): boolean {
+    static AreEqual(a: IPoint2D, b: IPoint2D): boolean {
         return a.x === b.x && a.y === b.y;
+    }
+
+    static Diff(a: IPoint2D, b: IPoint2D): XY {
+        return new XY(a.x - b.x, a.y - b.y);
     }
 
     x: number;
@@ -42,9 +46,13 @@ export class XY implements IPoint2D {
             this.y += delta.y;
         }
         return this;
-    }
+    };
 
     toString = () => `x:${this.x}, y:${this.y}`;
+
+    getNeighbors = () => {
+
+    };
 }
 
 export class XYZ implements IPoint3D {
