@@ -20,6 +20,9 @@ Combinations problem solved using dynamic programming, caching / memoizing resul
 ## Day 16
 **Grid2D** with some custom logic for elements. Used an abstract class for the shared logic. Part 2 solution ran a bit slow for the real input.
 
+## Day 17
+Implemented A* algorithm to pathfind through a multi-dimensional grid. This was extremely slow for the real input.
+
 # Setup
 
 ## Building
