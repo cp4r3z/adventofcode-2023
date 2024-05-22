@@ -36,29 +36,56 @@ export module Direction {
     CardinalToXY.set(Cardinal.South, new Points.XY(0, 1));
     CardinalToXY.set(Cardinal.West, new Points.XY(-1, 0));
     CardinalToXY.set(Cardinal.East, new Points.XY(1, 0));
-    // TODO: Up Down Right Left?
 
-    export class Obj {
-        public Left: Obj;
-        public Right: Obj;
+    export enum Turn {
+        Left = 1 << 0, // 1
+        Right = 1 << 1, // 2
+        Ahead = 1 << 2, // 4
+        Back = 1 << 3, // 8
+    }
+
+    export const Turns: Turn[] = [
+        Turn.Left, Turn.Right, Turn.Ahead, Turn.Back
+    ];
+
+    export class CardinalClass {
+        public Left: CardinalClass;
+        public Right: CardinalClass;
+        public Back: CardinalClass;
+        public Straight: CardinalClass;
         public XY: Points.IPoint2D;
         constructor(public Cardinal: Cardinal) {
             this.XY = CardinalToXY.get(this.Cardinal);
         }
     }
 
-    export const getDirectionObjs = () => {
-        const North = new Obj(Cardinal.North);
-        const East = new Obj(Cardinal.East);
-        const South = new Obj(Cardinal.South);
-        const West = new Obj(Cardinal.West);
-        North.Left = West; North.Right = East;
-        East.Left = North; East.Right = South;
-        South.Left = East; South.Right = West;
-        West.Left = South; West.Right = North;
-        return { North, East, South, West };
+    /**
+     * @returns A Map of Cardinal Direction Objects
+     */
+    export const ObjectMap = () => {
+        const North = new CardinalClass(Cardinal.North);
+        const East = new CardinalClass(Cardinal.East);
+        const South = new CardinalClass(Cardinal.South);
+        const West = new CardinalClass(Cardinal.West);
+        North.Left = West; North.Right = East; North.Back = South; North.Straight = North;
+        East.Left = North; East.Right = South; East.Back = West; East.Straight = East;
+        South.Left = East; South.Right = West; South.Back = North; South.Straight = South;
+        West.Left = South; West.Right = North; West.Back = East; West.Straight = West;
+        // return {
+        //     North,
+        //     East,
+        //     South,
+        //     West
+        // };
+        const map = new Map<Cardinal, CardinalClass>();
+        map.set(Cardinal.North, North);
+        map.set(Cardinal.East, East);
+        map.set(Cardinal.South, South);
+        map.set(Cardinal.West, West);
+        return map;
     }
 
+    // Used in Day 17. Maybe this isn't the best
     export const Back = (c: Cardinal): Cardinal => {
         if (c === Cardinal.North) return Cardinal.South;
         if (c === Cardinal.East) return Cardinal.West;
@@ -109,6 +136,20 @@ export class Grid2D extends Map<string, any> {
     getPoint = (point: Points.IPoint2D): any => {
         const hash: string = Grid2D.HashPointToKey(point);
 
+        let value: any = this.get(hash);
+
+        if (typeof (value) === 'undefined') {
+            value = null;
+            if (this.options.setOnGet) {
+                value = this.options.defaultValue;
+                this.set(hash, this.options.defaultValue);
+            }
+        }
+        return value;
+    };
+
+    getXY = (x: number, y: number): any => {
+        const hash: string = Grid2D.HashXYToKey(x, y);
         let value: any = this.get(hash);
 
         if (typeof (value) === 'undefined') {
