@@ -23,6 +23,9 @@ Combinations problem solved using dynamic programming, caching / memoizing resul
 ## Day 17
 Implemented A* algorithm to pathfind through a multi-dimensional grid. This was extremely slow for the real input.
 
+## Day 18
+Part 1 can be solved by flooding the interior of a 2D Grid. Part 2 is more difficult. Modeled the trench as a rectilinear polygon defined by a linked list of points. Used a generator function to define the iterator for the list, and then did a *very* simplified shoelace algorithm to get the area. The real shoelace algorithm involves matrix determinants and might be fun to revisit.
+
 # Setup
 
 ## Building

@@ -30,12 +30,19 @@ export module Direction {
         Cardinal.West
     ];
 
-    export const CardinalToXY: Map<Cardinal, Points.IPoint2D> = new Map<Cardinal, Points.XY>();
+    export const CardinalToXY: Map<Cardinal, Points.XY> = new Map<Cardinal, Points.XY>();
     // Y Down
     CardinalToXY.set(Cardinal.North, new Points.XY(0, -1));
     CardinalToXY.set(Cardinal.South, new Points.XY(0, 1));
     CardinalToXY.set(Cardinal.West, new Points.XY(-1, 0));
     CardinalToXY.set(Cardinal.East, new Points.XY(1, 0));
+
+    export const XYToCardinal = (unit: Points.XY): Cardinal => {
+        for (const c of Cardinals) {
+            if (Points.XY.AreEqual(CardinalToXY.get(c), unit)) return c;
+        }
+        throw new Error('Bad Input');
+    };
 
     export enum Turn {
         Left = 1 << 0, // 1
@@ -53,7 +60,7 @@ export module Direction {
         public Right: CardinalClass;
         public Back: CardinalClass;
         public Straight: CardinalClass;
-        public XY: Points.IPoint2D;
+        public XY: Points.XY;
         constructor(public Cardinal: Cardinal) {
             this.XY = CardinalToXY.get(this.Cardinal);
         }

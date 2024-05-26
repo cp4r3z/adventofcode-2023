@@ -1,5 +1,6 @@
 import { Direction, Grid2D, GridOptions, GridPoint } from "../common/grids/grid";
 import { XY, IPoint2D } from "../common/base/points";
+import { Polygon, PolygonPoint, PolygonPointList, Rectilinear } from "../common/base/shapes";
 
 const D = Direction.ObjectMap();
 
@@ -72,7 +73,6 @@ type Plan = {
     rgb: string,
 }
 
-
 const parse = (input: string) => {
     const re: RegExp = /(\w{1}).(\d+).\(\#(\S+)\)/;
     const dirs = {
@@ -98,7 +98,59 @@ const parse = (input: string) => {
     return parsed;
 };
 
-const part1 = async (input: string): Promise<number | string> => {
+const parse2 = (input: string) => {
+
+    const re: RegExp = /(\w{1}).(\d+).\(\#(\S+)\)/;
+
+    const dirs = {
+        '0': Direction.Cardinal.East,
+        '1': Direction.Cardinal.South,
+        '2': Direction.Cardinal.West,
+        '3': Direction.Cardinal.North
+    };
+
+    const toPlan = (s: string): Plan => {
+        const matches = s.match(re);
+        const rgb = matches[3];
+        const meters = parseInt(rgb.substring(0, 5), 16); // Radix 16 (HEX)
+        const direction = dirs[rgb.substring(5, 6)];
+        return {
+            direction,
+            meters,
+            rgb
+        };
+    };
+
+    const plans = input
+        .split('\n')
+        .map(toPlan);
+
+    return plans;
+};
+
+
+const digTrench = (plans: Plan[]): Rectilinear => {
+    let point = new PolygonPoint(0, 0);
+    const start = point;
+    for (const plan of plans) {
+        if (plan === plans[plans.length - 1]) {
+            continue; // Do not add the end point
+        }
+        let moveVector = D.get(plan.direction).XY.copy();
+        moveVector.multiply(plan.meters);
+        const nextPosition = point.copy().move(moveVector);
+        const next = new PolygonPoint(nextPosition.x, nextPosition.y);
+        point.insertNext(next);
+        point = point.Next;
+    }
+
+    const pointList = new PolygonPointList();
+    pointList.Start = start;
+    const trench = new Rectilinear(pointList);
+    return trench;
+}
+
+export const part1 = async (input: string): Promise<number | string> => {
     const plan = parse(input);
     const options: GridOptions = {
         setOnGet: false,
@@ -126,8 +178,9 @@ const part1 = async (input: string): Promise<number | string> => {
     return site.size;
 };
 
-const part2 = async (input: string): Promise<number | string> => {
-    return 0;
+export const part2 = async (input: string): Promise<number | string> => {
+    const plans = parse2(input);
+    const trench: Rectilinear = digTrench(plans);
+    const area = trench.area();
+    return area;
 };
-
-export { part1, part2 };

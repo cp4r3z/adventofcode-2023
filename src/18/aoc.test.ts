@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const tinput = await Input.tinput(__dirname);
-const tinput2 = await Input.tinput2(__dirname);
+//const tinput2 = await Input.tinput2(__dirname);
 const input = await Input.input(__dirname);
 
 describe(`Day 18`, () => {
@@ -20,9 +20,9 @@ describe(`Day 18`, () => {
         console.log(solution);
     });
 
-    xit('Part 2', async () => {
+    it('Part 2', async () => {
         const solution = await part2(tinput);
-        expect(solution).toBe(94);
+        expect(solution).toBe(952408144115);
     });
 
     xit('Part 2 (Real Input)', async () => {

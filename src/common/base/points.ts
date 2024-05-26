@@ -48,6 +48,19 @@ export class XY implements IPoint2D {
         return this;
     };
 
+    multiply = (scalar: number) => {
+        this.x *= scalar;
+        this.y *= scalar;
+        return this;
+    }
+
+    unit = () => {
+        const magnitude = Math.sqrt((this.x * this.x + this.y * this.y));
+        this.x /= magnitude;
+        this.y /= magnitude;
+        return this;
+    }
+
     toString = () => `x:${this.x}, y:${this.y}`;
 
     getNeighbors = () => {
