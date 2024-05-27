@@ -4,7 +4,7 @@ https://adventofcode.com/2023
 [![Build Status](https://github.com/cp4r3z/adventofcode-2023/actions/workflows/node.js.yml/badge.svg)](https://github.com/cp4r3z/adventofcode-2023/actions)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/cp4r3z/adventofcode-2023/main/LICENSE)
 
-# Notables
+# Notables / Spoilers
 
 ## Day 5
 Brute force solution found on the day, but a performant solution took... a long time.
@@ -25,6 +25,9 @@ Implemented A* algorithm to pathfind through a multi-dimensional grid. This was 
 
 ## Day 18
 Part 1 can be solved by flooding the interior of a 2D Grid. Part 2 is more difficult. Modeled the trench as a rectilinear polygon defined by a linked list of points. Used a generator function to define the iterator for the list, and then did a *very* simplified shoelace algorithm to get the area. The real shoelace algorithm involves matrix determinants and might be fun to revisit.
+
+## Day 19
+Parsing into a suitable data model was interesting. Similar to Day 5, Part 2 requires finding total combinations using Intervals.
 
 # Setup
 

@@ -1,7 +1,36 @@
+import { In, Intersection, Interval } from "../common/intervals/interval";
+
 class Part {
     constructor(public x: number, public m: number, public a: number, public s: number) { }
     sum() {
         return this.x + this.m + this.a + this.s;
+    }
+}
+
+class PartPossible {
+    public x: Interval;
+    public m: Interval;
+    public a: Interval;
+    public s: Interval;
+
+    constructor() {
+        this.x = new Interval(1, 4000);
+        this.m = new Interval(1, 4000);
+        this.a = new Interval(1, 4000);
+        this.s = new Interval(1, 4000);
+    }
+
+    numCombinations() {
+        return this.x.size() * this.m.size() * this.a.size() * this.s.size();
+    }
+
+    clone() {
+        const copy = new PartPossible();
+        copy.x = this.x.clone();
+        copy.m = this.m.clone();
+        copy.a = this.a.clone();
+        copy.s = this.s.clone();
+        return copy;
     }
 }
 
@@ -10,6 +39,9 @@ class Rule {
     public condCategory: string;
     public condLtGt: string;
     public condRating: number;
+
+    // Part 2
+    public condInterval: Interval;
 
     public tempflow: string;
     public outflow: Workflow;
@@ -28,6 +60,27 @@ class Rule {
         }
         return this.outflow;
     }
+
+    // Part 2
+    combinations(part: PartPossible): number {
+        const passing = part.clone();
+        if (!part[this.condCategory]) {
+            // No condition (all pass)
+            return this.outflow.possibleAccepted(passing);
+        }
+
+        const intersection: Intersection = part[this.condCategory].IntersectWith(this.condInterval);
+        const failedCondition = intersection.get(In.This); // "This" is the part category interval
+        const passesCondition = intersection.get(In.This | In.That); // "Both"
+
+        passing[this.condCategory] = passesCondition[0];
+
+        // modify the original part intervals
+        part[this.condCategory] = failedCondition[0];
+
+        // return the number of combinations that PASSED the rule.
+        return this.outflow.possibleAccepted(passing);
+    }
 }
 
 class Workflow {
@@ -44,7 +97,7 @@ class Workflow {
         this.rules.forEach(rule => rule.mapTempFlows(workflowMap));
     }
 
-    isAccepted(part: Part) {
+    isAccepted(part: Part): boolean {
         if (this.accepted || this.rejected) {
             return this.accepted;
         }
@@ -54,8 +107,33 @@ class Workflow {
                 return result.isAccepted(part);
             }
         }
-        // Should I ever get here?
-        console.log('what?');
+        throw new Error('isAccepted');
+    }
+
+    possibleAccepted(part: PartPossible): number {
+        const combinationsBeforeRules = part.numCombinations();
+
+        if (combinationsBeforeRules === 0) {
+            return combinationsBeforeRules;
+        }
+        if (this.rejected) {
+            return 0;
+        }
+        if (this.accepted) {
+            return combinationsBeforeRules;
+        }
+
+        // Add up all the combinations in the rules
+        let combinations: number = 0;
+        for (const rule of this.rules) {
+            const ruleCombinations: number = rule.combinations(part); // This will modify the part intervals
+            combinations += ruleCombinations;
+            if (part.numCombinations() === 0) {
+                break;
+            }
+        }
+
+        return combinations;
     }
 }
 
@@ -82,7 +160,13 @@ const parse = (input: string) => {
         rule.condLtGt = matches[2];
         rule.condRating = Number(matches[3]);
 
-        rule.tempflow = matches[4];
+        rule.tempflow = matches[4]; // Must map tempflows after all created
+
+        // For Part 2
+        rule.condInterval = rule.condLtGt === '>' ?
+            new Interval(rule.condRating + 1, 4000) :
+            new Interval(1, rule.condRating - 1);
+
         return rule;
     };
 
@@ -123,14 +207,15 @@ const parse = (input: string) => {
 };
 
 export const part1 = async (input: string): Promise<number | string> => {
-    const { workflows, inWorkflow, parts } = parse(input);
+    const { inWorkflow, parts } = parse(input);
     const accepted = parts.filter(part => inWorkflow.isAccepted(part));
     const sum = accepted.reduce((_sum, part) => _sum + part.sum(), 0);
     return sum;
 };
 
 export const part2 = async (input: string): Promise<number | string> => {
-    const parsed = parse(input);
-
-    return 0;
+    const { inWorkflow, parts } = parse(input);
+    const part = new PartPossible();
+    const possibleCombinations = inWorkflow.possibleAccepted(part);
+    return possibleCombinations;
 };

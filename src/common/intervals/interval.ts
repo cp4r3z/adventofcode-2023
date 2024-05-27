@@ -17,7 +17,7 @@ export enum In { // Whether or not we're currently in the this or that intervals
     //Both = 1 << 2, // 4
 };
 
-export class Intersection extends Map<number, IInterval[]>{
+export class Intersection extends Map<number, IInterval[]> {
     constructor() {
         super();
         this.set(In.This, []);
@@ -77,4 +77,8 @@ export class Interval implements IInterval {
         });
         return result;
     }
+
+    clone(): Interval { return new Interval(this.Low, this.High); }
+
+    size(): number { return this.High - this.Low + 1; }
 }
