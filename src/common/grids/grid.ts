@@ -272,6 +272,7 @@ export class Grid2D extends Map<string, any> {
         return this.bounds.hasPoint(p);
     }
 
+    getOptions = () => this.options;
 
     // Deprecated
     hashOld = () => {
