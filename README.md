@@ -29,6 +29,9 @@ Part 1 can be solved by flooding the interior of a 2D Grid. Part 2 is more diffi
 ## Day 19
 Parsing into a suitable data model was interesting. Similar to Day 5, Part 2 requires finding total combinations using Intervals.
 
+## Day 20
+Stored the state flags as a BitInt using bitwise operators. Part 2 was some manual logic analysis and then finding cycles similar to Day 08.
+
 # Setup
 
 ## Building

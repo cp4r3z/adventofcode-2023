@@ -1,8 +1,24 @@
-// type OutputData = {
-//     module: Module;
-//     pulseBit: bigint;
-//     nPulseBit: bigint;
-// }
+import * as Arithmetic from '../common/math/arithmetic';
+
+type State = {
+
+    registry: bigint; // Store everything stateful
+    lastBit: bigint; // The highest / last bit of registry
+
+    // bit position for a state
+    // 1 << 0, // 1
+    // 1 << 1, // 2
+    // 1 << 2, // 4   
+
+    sentLow: number;
+    sentHigh: number;
+}
+
+type Pulse = {
+    sender: Module;
+    receiver: Module;
+    isHigh: boolean;
+}
 
 abstract class Module {
 
@@ -140,6 +156,8 @@ const parse = (input: string) => {
 
     let broadcaster;
 
+    let ft: Module; // For Part 2
+
     const toModule = ((s: string, i: number) => {
         const matches = s.match(reInsOuts);
         const inString = matches[1];
@@ -160,56 +178,35 @@ const parse = (input: string) => {
         const outIds = matches[2].split(', ');
         tempMapOuts.set(module.id, outIds);
 
+        if (module.id === 'ft') {
+            ft = module;
+        }
+
         return module;
     });
 
     const lines = input.split('\n');
     const modules: Module[] = lines.map(toModule);
 
-    // Dummy output module for testing
-    const dummy = new Broadcast('output');
-    tempMapModules.set('output', dummy);
-
     const button = new Broadcast('button');
     button.linkToModule(broadcaster);
+
+    let rx: Module;
 
     modules.forEach((module: Module) => {
         const outStrings = tempMapOuts.get(module.id) || [];
         outStrings.forEach(outId => {
-            const outModule = tempMapModules.get(outId);
+            let outModule = tempMapModules.get(outId);
             if (!outModule) {
-                debugger;
+                // Create a module with no outputs
+                outModule = new Broadcast(outId);
+                if (outModule.id === 'rx') {
+                    rx = outModule;
+                }
             }
             module.linkToModule(outModule);
         });
     });
-
-    return { button, broadcaster, modules };
-};
-
-type State = {
-    // TODO: Does the registry need to be a bigint?
-
-    // bit position for a state
-    // 1 << 0, // 1
-    // 1 << 1, // 2
-    // 1 << 2, // 4   
-    registry: bigint; // Store everything stateful
-    lastBit: bigint; // The highest / last bit of registry
-
-    // Can this be moved elsewhere?
-    sentLow: number;
-    sentHigh: number;
-}
-
-type Pulse = {
-    sender: Module;
-    receiver: Module;
-    isHigh: boolean;
-}
-
-export const part1 = async (input: string): Promise<number | string> => {
-    const { button, broadcaster, modules } = parse(input);
 
     const state: State = {
         registry: 0n,
@@ -220,7 +217,13 @@ export const part1 = async (input: string): Promise<number | string> => {
 
     modules.forEach(module => {
         module.initRegisters(state);
-    })
+    });
+
+    return { state, button, broadcaster, rx, ft };
+};
+
+export const part1 = async (input: string): Promise<number | string> => {
+    const { state, button, broadcaster } = parse(input);
 
     const buttonPress: Pulse = {
         sender: button,
@@ -228,7 +231,7 @@ export const part1 = async (input: string): Promise<number | string> => {
         isHigh: false
     };
 
-    // Press button 1000 times?
+    // 1000 Button Presses
     for (let i = 1; i <= 1000; i++) {
         const pulseQueue: Pulse[] = [buttonPress];
         state.sentLow++;
@@ -243,5 +246,58 @@ export const part1 = async (input: string): Promise<number | string> => {
 };
 
 export const part2 = async (input: string): Promise<number | string> => {
-    return 0;
+    const { state, button, broadcaster, rx, ft } = parse(input);
+
+    const buttonPress: Pulse = {
+        sender: button,
+        receiver: broadcaster,
+        isHigh: false
+    };
+
+    // Store the frequency at which ft's inputs are sent high pulses
+    // Note: We know (from analysis) that the frequencies are regular and occur sequentially
+    const ftHigh: number[] = [];
+
+    let buttonPresses = 0;
+    let rxPressed = false;
+    while (!rxPressed) {
+
+        const pulseQueue: Pulse[] = [buttonPress];
+        buttonPresses++;
+
+        state.sentLow++;
+        while (pulseQueue.length > 0) {
+            const pulse = pulseQueue.shift();
+            if (pulse.receiver === rx && !pulse.isHigh) {
+                // In theory, this would work if we let the computer run.
+                rxPressed = true;
+                break;
+            }
+
+            // Instead, we look at rx's input ft, which is a Conjunction
+            // We record the high pulses
+
+            if (pulse.receiver === ft && pulse.isHigh) {
+
+                // Debugging
+                {
+                    let countStr = buttonPresses.toString();
+                    while (countStr.length < 5) {
+                        countStr = "0" + countStr;
+                    }
+                    console.log(`${countStr} | ${pulse.sender.id} -${pulse.isHigh ? "high" : "low"}-> ${pulse.receiver.id}`);
+                }
+                ftHigh.push(buttonPresses);
+            }
+            pulse.receiver.processPulse(state, pulse, pulseQueue);
+        }
+
+        if (ftHigh.length === 4) {
+            // Similar to the cycle solution in Day 08
+            buttonPresses = ftHigh.reduce(Arithmetic.LCM, 1);
+            rxPressed = true;
+        }
+    }
+
+    return buttonPresses;
 };

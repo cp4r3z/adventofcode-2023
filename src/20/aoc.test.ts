@@ -25,9 +25,10 @@ describe(`Day 20`, () => {
         console.log(solution);
     });
 
+    // Anomalously, there is no test for Part 2
     xit('Part 2', async () => {
         const solution = await part2(tinput);
-        expect(solution).toBe(167409079868000);
+        expect(solution).toBe(0);
     });
 
     xit('Part 2 (Real Input)', async () => {
