@@ -1,5 +1,6 @@
 import * as Points from "../base/points";
 import * as Shapes from "../base/shapes";
+
 const { createHash } = await import('node:crypto');
 
 export interface IGrid2D {
@@ -252,6 +253,9 @@ export class Grid2D extends Map<string, any> {
     }
 
     getBounds = () => this.bounds;
+    setBounds = (r: Shapes.Rectangle)=>{
+        this.bounds = r;
+    }
 
     getEdgePoints = (): Points.IPoint2D[] => {
         const points: Points.IPoint2D[] = [];
