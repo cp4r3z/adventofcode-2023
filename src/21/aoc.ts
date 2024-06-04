@@ -4,75 +4,7 @@ import { Rectangle } from "../common/base/shapes";
 
 const D = Direction.ObjectMap();
 
-export type Grid2dInfiniteOptions = GridOptions & {
-    singleRepeated: boolean;
-    bounds: Rectangle;
-}
 
-// Maybe make an interface for Grid2D?
-class Grid2DInfinite extends Grid2D {
-    private _optionsInf: Grid2dInfiniteOptions;
-
-    constructor(options?: Grid2dInfiniteOptions) {
-        super(options);
-        this._optionsInf = options;
-    }
-
-    _subXY = (point: Points.IPoint2D) => {
-        const bounds = this._optionsInf.bounds;
-        // Quotient
-        const quoX = Math.floor(point.x / (bounds.maxX + 1)); // Double-check
-        const quoY = Math.floor(point.y / (bounds.maxY + 1));
-        // Modulus
-        const modX = point.x % bounds.maxX;
-        const modY = point.y % bounds.maxY;
-        return {
-            quo: new Points.XY(quoX, quoY),
-            mod: new Points.XY(modX, modY)
-        };
-    }
-
-    setGridPoint = (point: GridPoint): void => {
-        const sub = this._subXY(point);
-
-        // Find the Sub-Grid
-
-        if (this._optionsInf.singleRepeated && !this.bounds.hasPoint(point)) {
-            throw new Error('Out of Bounds');
-        }
-
-        const quoHash: string = Grid2D.HashPointToKey(sub.quo);
-        let subGrid: Grid2D = this.get(quoHash);
-        if (!subGrid) {
-            subGrid = new Grid2D(this._optionsInf);
-            this.setPoint(sub.quo, subGrid);
-        }
-
-        // Set the point within the Sub-Grid
-        subGrid.setPoint(sub.mod, point);
-    }
-
-    getPoint = (point: Points.IPoint2D): any => {
-        const sub = this._subXY(point);
-
-        // Find the Sub-Grid
-
-        // Re-Use a single grid if repeated
-        const quoPoint = this._optionsInf.singleRepeated ? new Points.XY(0, 0) : sub.quo;
-
-        const quoHash: string = Grid2D.HashPointToKey(quoPoint);
-        let subGrid: Grid2D = this.get(quoHash);
-        if (!subGrid) {
-            if (this._optionsInf.setOnGet) {
-                throw new Error('Not Implemented');
-            }
-            return this._optionsInf.defaultValue; // Double-check
-        }
-
-        // Get the point within the Sub-Grid
-        return subGrid.getPoint(sub.mod);
-    };
-}
 
 class InfiniteGrid2D {
 

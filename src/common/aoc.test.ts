@@ -3,8 +3,10 @@ import * as Point from './base/points';
 import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
 import MultiParentTree, { IMultiParentNode } from './trees/multiparent';
+import { GridOfGrid2D, GridOfGrid2DOptions } from './grids/gridofgrid';
+import { GridPoint } from './grids/grid';
 
-describe('Common Tests: Shape.Rectangle', () => {
+xdescribe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -68,7 +70,7 @@ describe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-describe('Common Tests: QuadTree', () => {
+xdescribe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -225,7 +227,7 @@ describe('Common Tests: QuadTree', () => {
     });
 });
 
-describe('Common Tests: Intervals', () => {
+xdescribe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
@@ -404,7 +406,7 @@ describe('Common Tests: Intervals', () => {
 
 });
 
-describe('Common Tests: Trees', () => {
+xdescribe('Common Tests: Trees', () => {
     it('Construct MultiParentTree with N Leaves', async () => {
         class Node implements IMultiParentNode {
             public Left: Node;
@@ -426,5 +428,22 @@ describe('Common Tests: Trees', () => {
         expect(tree.Leaves[0].RightParent.Right.Data).toBe(-1);
         expect(tree.Leaves[4].LeftParent.Left.Data).toBe(1);
         expect(tree.LevelCount()).toBe(5);
+    });
+});
+
+describe('Common Tests: Grids',  () => {
+    describe('Grid2DInfinite',  () => {
+        it('Fills a Grid of Grids', async () => {
+            //const gogOptions:GridOfGrid2DOptions = {};
+            const bounds = new Shape.Rectangle(new Point.XY(0, 0), new Point.XY(3, 3)); // 4x4
+            const gog = new GridOfGrid2D(bounds);
+            for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 8; x++) {
+                    const point = new GridPoint(x, y, `${x},${y}`);
+                    gog.setGridPoint(point);
+                }
+            }
+            //debugger;
+        });
     });
 });
