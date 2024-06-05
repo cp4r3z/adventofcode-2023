@@ -6,7 +6,7 @@ import MultiParentTree, { IMultiParentNode } from './trees/multiparent';
 import { GridOfGrid2D, GridOfGrid2DOptions } from './grids/gridofgrid';
 import { GridPoint } from './grids/grid';
 
-xdescribe('Common Tests: Shape.Rectangle', () => {
+describe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
     const r_x1y1 = new Point.XY(1, 1);
     const rTest = new Shape.Rectangle(r_x0y0, r_x1y1);
@@ -70,7 +70,7 @@ xdescribe('Common Tests: Shape.Rectangle', () => {
 
 });
 
-xdescribe('Common Tests: QuadTree', () => {
+describe('Common Tests: QuadTree', () => {
     const r2x2 = {
         x0y0: new Point.XY(0, 0),
         x1y1: new Point.XY(1, 1)
@@ -227,7 +227,7 @@ xdescribe('Common Tests: QuadTree', () => {
     });
 });
 
-xdescribe('Common Tests: Intervals', () => {
+describe('Common Tests: Intervals', () => {
     /**
      *    -10123456789
      * A      {     }   <- A
@@ -406,7 +406,7 @@ xdescribe('Common Tests: Intervals', () => {
 
 });
 
-xdescribe('Common Tests: Trees', () => {
+describe('Common Tests: Trees', () => {
     it('Construct MultiParentTree with N Leaves', async () => {
         class Node implements IMultiParentNode {
             public Left: Node;
@@ -431,20 +431,37 @@ xdescribe('Common Tests: Trees', () => {
     });
 });
 
-describe('Common Tests: Grids',  () => {
-    describe('Grid2DInfinite',  () => {
-        it('Fills a Grid of Grids', async () => {
-            //const gogOptions:GridOfGrid2DOptions = {};
-            const bounds = new Shape.Rectangle(new Point.XY(0, 0), new Point.XY(3, 3)); // 4x4
-            const gog = new GridOfGrid2D(bounds);
-            for (let y = 0; y < 8; y++) {
-                for (let x = 0; x < 8; x++) {
-                    const point = new GridPoint(x, y, `${x},${y} `);
+describe('Common Tests: Grids', () => {
+    describe('Grid2DInfinite', () => {
+        
+        let gog: GridOfGrid2D; // Common Test Object
+        
+        beforeAll(() => {
+            const subGridBounds = new Shape.Rectangle(new Point.XY(0, 0), new Point.XY(3, 3)); // 4x4
+            gog = new GridOfGrid2D(subGridBounds);
+            for (let y = -4; y < 4; y++) {
+                for (let x = -4; x < 4; x++) {
+                    let signX = (x > -1) ? ' ' : '';
+                    let signY = (y > -1) ? ' ' : '';
+                    const point = new GridPoint(x, y, `${signX}${x},${signY}${y} `);
                     gog.setGridPoint(point);
                 }
             }
-            //debugger;
+        });
+
+        it('Print', async () => {
             gog.print();
+        });
+
+        it('Bounds', async () => {
+            const bounds: Shape.Rectangle = gog.getBounds();
+            expect(Point.XY.AreEqual(bounds.x0y0, new Point.XY(-4, -4))).toBeTruthy();
+            expect(Point.XY.AreEqual(bounds.x1y1, new Point.XY(3, 3))).toBeTruthy();
+        });
+
+        it('Point', async () => {
+            const point: GridPoint = gog.getPoint(new Point.XY(3, 3));
+            expect(point.Value).toBe(' 3, 3 ');
         });
     });
 });

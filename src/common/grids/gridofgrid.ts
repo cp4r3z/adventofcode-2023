@@ -82,13 +82,11 @@ export class GridOfGrid2D extends Grid2D {
         const subGridDeltaX = this._subGridBounds.deltaX(true);
         const subGridDeltaY = this._subGridBounds.deltaY(true);
 
-        // TODO: If minX is less than 0 it's probably wrong!
         const minX = this.bounds.minX * subGridDeltaX;
-        const maxX = ((this.bounds.maxX + 1) * subGridDeltaX) - 1;
-        
-        // TODO: If minX is less than 0 it's probably wrong!
+        const maxX = ((this.bounds.maxX + 1) * subGridDeltaX) - 1;        
         const minY = this.bounds.minY * subGridDeltaY;
         const maxY = ((this.bounds.maxY + 1) * subGridDeltaY) - 1;
+        
         const bounds = new Rectangle(new XY(minX, minY), new XY(maxX, maxY));
         return bounds;
     }
