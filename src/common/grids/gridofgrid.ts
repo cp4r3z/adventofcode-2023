@@ -9,16 +9,22 @@ export type GridOfGrid2DOptions = GridOptions & {
 // Maybe make an interface for Grid2D?
 export class GridOfGrid2D extends Grid2D {
     private _optionsGoG: GridOfGrid2DOptions;
-    private _bounds: Rectangle;
 
-    constructor(bounds: Rectangle, options?: GridOfGrid2DOptions) {
+    // This is the size of each subgrid.
+    private readonly _subGridBounds: Rectangle;
+
+    // super has:
+    //protected bounds: Shapes.Rectangle = null;
+
+
+    constructor(subGridBounds: Rectangle, options?: GridOfGrid2DOptions) {
         super(options);
-        this._bounds = bounds;
+        this._subGridBounds = subGridBounds;
         this._optionsGoG = options;
     }
 
     _subXY = (point: IPoint2D) => {
-        const bounds = this._bounds;
+        const bounds = this._subGridBounds;
         // Quotient
         const quoX = Math.floor(point.x / (bounds.maxX + 1)); // Double-check
         const quoY = Math.floor(point.y / (bounds.maxY + 1));
@@ -71,4 +77,60 @@ export class GridOfGrid2D extends Grid2D {
         // Get the point within the Sub-Grid
         return subGrid.getPoint(sub.mod);
     };
+
+    getBounds = (): Rectangle => {
+        const subGridDeltaX = this._subGridBounds.deltaX(true);
+        const subGridDeltaY = this._subGridBounds.deltaY(true);
+
+        // TODO: If minX is less than 0 it's probably wrong!
+        const minX = this.bounds.minX * subGridDeltaX;
+        const maxX = ((this.bounds.maxX + 1) * subGridDeltaX) - 1;
+        
+        // TODO: If minX is less than 0 it's probably wrong!
+        const minY = this.bounds.minY * subGridDeltaY;
+        const maxY = ((this.bounds.maxY + 1) * subGridDeltaY) - 1;
+        const bounds = new Rectangle(new XY(minX, minY), new XY(maxX, maxY));
+        return bounds;
+    }
+
+    print = (yDown = true) => {
+
+        // Figure out actual size of the grid
+        const bounds = this.getBounds();
+
+        const printLine = (y: number) => {
+            let line = '';
+            for (let x = bounds.minX; x <= bounds.maxX; x++) {
+                let value = this.getPoint(new XY(x, y));
+                if (value?.print) {
+                    value = value.print();
+                }
+                // if (!value){
+                //     value = this._optionsGoG.defaultValue;
+                // }
+
+                // if (typeof (value) === 'undefined') {
+                //     value = this.options.defaultValue;
+                //     if (this.options.setOnGet) {
+                //         this.set(key, value);
+                //     }
+                // } else if (value?.print) {
+                //     value = value.print();
+                // }
+                line += value;
+            }
+            console.log(line);
+        }
+
+        if (yDown) {
+            for (let y = bounds.minY; y <= bounds.maxY; y++) {
+                printLine(y);
+            }
+        } else {
+            for (let y = bounds.maxY; y >= bounds.minY; y--) {
+                printLine(y);
+            }
+        }
+    }
+
 }

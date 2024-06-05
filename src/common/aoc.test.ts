@@ -439,11 +439,12 @@ describe('Common Tests: Grids',  () => {
             const gog = new GridOfGrid2D(bounds);
             for (let y = 0; y < 8; y++) {
                 for (let x = 0; x < 8; x++) {
-                    const point = new GridPoint(x, y, `${x},${y}`);
+                    const point = new GridPoint(x, y, `${x},${y} `);
                     gog.setGridPoint(point);
                 }
             }
             //debugger;
+            gog.print();
         });
     });
 });
