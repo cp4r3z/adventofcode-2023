@@ -4,7 +4,7 @@ import * as QuadTree from './quadtree';
 import * as Interval from './intervals/interval';
 import MultiParentTree, { IMultiParentNode } from './trees/multiparent';
 import { GridOfGrid2D, GridOfGrid2DOptions } from './grids/gridofgrid';
-import { GridPoint } from './grids/grid';
+import { GridPoint, Grid2D } from './grids/grid';
 
 describe('Common Tests: Shape.Rectangle', () => {
     const r_x0y0 = new Point.XY(-1, -1);
@@ -434,7 +434,7 @@ describe('Common Tests: Trees', () => {
 describe('Common Tests: Grids', () => {
     describe('Grid2DInfinite', () => {
         
-        let gog: GridOfGrid2D; // Common Test Object
+        let gog: GridOfGrid2D<Grid2D>; // Common Test Object
         
         beforeAll(() => {
             const subGridBounds = new Shape.Rectangle(new Point.XY(0, 0), new Point.XY(3, 3)); // 4x4

@@ -7,7 +7,8 @@ export type GridOfGrid2DOptions = GridOptions & {
 }
 
 // Maybe make an interface for Grid2D?
-export class GridOfGrid2D extends Grid2D {
+// This was made generic as an abandoned thought. Feel free to change back.
+export class GridOfGrid2D<SubGrid extends Grid2D>  extends Grid2D {
     private _optionsGoG: GridOfGrid2DOptions;
 
     // This is the size of each subgrid.
@@ -86,7 +87,7 @@ export class GridOfGrid2D extends Grid2D {
         const maxX = ((this.bounds.maxX + 1) * subGridDeltaX) - 1;        
         const minY = this.bounds.minY * subGridDeltaY;
         const maxY = ((this.bounds.maxY + 1) * subGridDeltaY) - 1;
-        
+
         const bounds = new Rectangle(new XY(minX, minY), new XY(maxX, maxY));
         return bounds;
     }
