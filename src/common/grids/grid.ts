@@ -22,6 +22,10 @@ export module Direction {
         South = 1 << 1, // 2
         West = 1 << 2, // 4
         East = 1 << 3, // 8
+        NorthWest = 1 << 4,
+        NorthEast = 1 << 5,
+        SouthWest = 1 << 6,
+        SouthEast = 1 << 7
     };
 
     export const Cardinals: Cardinal[] = [
@@ -253,7 +257,7 @@ export class Grid2D extends Map<string, any> {
     }
 
     getBounds = () => this.bounds;
-    setBounds = (r: Shapes.Rectangle)=>{
+    setBounds = (r: Shapes.Rectangle) => {
         this.bounds = r;
     }
 
