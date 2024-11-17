@@ -73,6 +73,9 @@ class InfiniteGrid2D {
 
 }
 
+// One performance issue here is that we evaluate all the steps every time.
+// We really only need to maintain a list of "leading edge steps"
+// or last placed. Like a QUEUE.
 class Garden {
     constructor(public map: InfiniteGrid2D, public steps: Grid2D) { }
 
@@ -194,7 +197,7 @@ const parse = (input: string) => {
     //const bounds = map.getBounds();
     let size = input.split('\n').length;
     map.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(size - 1, size - 1)));
-
+    map.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(size - 1, size - 1)));
 
     const infiniteMap = new InfiniteGrid2D(map.getOptions(), map, true);
     const garden = new Garden(infiniteMap, steps);

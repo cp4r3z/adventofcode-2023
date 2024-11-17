@@ -32,6 +32,9 @@ Parsing into a suitable data model was interesting. Similar to Day 5, Part 2 req
 ## Day 20
 Stored the state flags as a BitInt using bitwise operators. Part 2 was some manual logic analysis and then finding cycles similar to Day 08.
 
+## Day 21
+Oh dear...
+
 # Setup
 
 ## Building
