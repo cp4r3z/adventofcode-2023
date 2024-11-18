@@ -13,166 +13,222 @@ const tinput = await Input.tinput(__dirname);
 const input = await Input.input(__dirname);
 
 describe(`Day 21`, () => {
-    describe(`Garden Tests`, () => {
-        const garden = new Garden();
-        garden.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(2, 2)));
-        it(`Garden Size`, () => {
-            const size: number = garden.getBounds().deltaX(true);
-            expect(size).toBe(3);
-        });
-        it(`Leading Edge - Diagonals`, () => {
-            let test: AllSectionResults;
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(1);
-            expect(test.Diagonals.Standard.Whole).toBe(0);
-            expect(test.Diagonals.Standard.Partial).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(3);
-            expect(test.Diagonals.Standard.Whole).toBe(0);
-            expect(test.Diagonals.Standard.Partial).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(4);
-            expect(test.Diagonals.Standard.Whole).toBe(0);
-            expect(test.Diagonals.Standard.Partial).toBe(1);
-            expect(test.Diagonals.Standard.PartialSteps).toBe(1);
-            expect(test.Diagonals.Parity.Partial).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(7);
-            expect(test.Diagonals.Standard.Whole).toBe(0);
-            expect(test.Diagonals.Standard.Partial).toBe(1);
-            expect(test.Diagonals.Standard.PartialSteps).toBe(4);
-            expect(test.Diagonals.Parity.Whole).toBe(0);
-            expect(test.Diagonals.Parity.Partial).toBe(2);
-            expect(test.Diagonals.Parity.PartialSteps).toBe(1);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(8);
-            expect(test.Diagonals.Standard.Whole).toBe(1);
-            expect(test.Diagonals.Standard.Partial).toBe(0);
-            expect(test.Diagonals.Parity.Partial).toBe(2);
-            expect(test.Diagonals.Parity.PartialSteps).toBe(2);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(9);
-            expect(test.Diagonals.Standard.Whole).toBe(1);
-            expect(test.Diagonals.Standard.Partial).toBe(0);
-            expect(test.Diagonals.Parity.Partial).toBe(2);
-            expect(test.Diagonals.Parity.PartialSteps).toBe(3);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(10);
-            expect(test.Diagonals.Standard.PartialSteps).toBe(1);
-            expect(test.Diagonals.Parity.Partial).toBe(2);
-            expect(test.Diagonals.Parity.PartialSteps).toBe(4);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(11);
-            expect(test.Diagonals.Standard.Whole).toBe(1);
-            expect(test.Diagonals.Parity.Whole).toBe(2);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(13);
-            expect(test.Diagonals.Standard.Whole).toBe(1);
-            expect(test.Diagonals.Standard.Partial).toBe(3);
-            expect(test.Diagonals.Standard.PartialSteps).toBe(4);
-            expect(test.Diagonals.Parity.Whole).toBe(2);
-            expect(test.Diagonals.Parity.Partial).toBe(4);
-            expect(test.Diagonals.Parity.PartialSteps).toBe(1);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(20);
-            expect(test.Diagonals.Standard.Whole).toBe(9); // 1 + 3 + 5
-            expect(test.Diagonals.Parity.Whole).toBe(6);   // 2 + 4
-        });
-        it(`Leading Edge - Cross`, () => {
-            let test: AllSectionResults;
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(1);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(0);
-            expect(test.Cross.Parity.Partial).toBe(0);
-            expect(test.Cross.Parity.PartialSteps).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(2);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(0);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(1);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(3);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(0);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(2);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(4);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(0);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(3);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(5);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(1);
-            expect(test.Cross.Standard.PartialSteps).toBe(1);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(0);
-            expect(test.Cross.Parity.PartialSteps).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(6);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(1);
-            expect(test.Cross.Standard.PartialSteps).toBe(2);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(0);
-            expect(test.Cross.Parity.PartialSteps).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(7);
-            expect(test.Cross.Standard.Whole).toBe(0);
-            expect(test.Cross.Standard.Partial).toBe(1);
-            expect(test.Cross.Standard.PartialSteps).toBe(3);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(0);
-            expect(test.Cross.Parity.PartialSteps).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(8);
-            expect(test.Cross.Standard.Whole).toBe(1);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(1);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(9);
-            expect(test.Cross.Standard.Whole).toBe(1);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(2);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(10);
-            expect(test.Cross.Standard.Whole).toBe(1);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            expect(test.Cross.Parity.Whole).toBe(1);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(3);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(14);
-            expect(test.Cross.Standard.Whole).toBe(2);
-            expect(test.Cross.Standard.Partial).toBe(0);
-            expect(test.Cross.Standard.PartialSteps).toBe(0);
-            // @ts-expect-error # Calling private method
-            test = garden._getSections(20);
-            expect(test.Cross.Parity.Whole).toBe(3);
-            expect(test.Cross.Parity.Partial).toBe(1);
-            expect(test.Cross.Parity.PartialSteps).toBe(1);
-        });
-    });
 
+    describe(`Garden Tests`, () => {
+
+        describe(`3x3`, () => {
+            const garden = new Garden();
+            garden.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(2, 2)));
+            it(`Garden Size`, () => {
+                const size: number = garden.getBounds().deltaX(true);
+                expect(size).toBe(3);
+            });
+            it(`Leading Edge - Diagonals`, () => {
+                let test: AllSectionResults;
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(1);
+                expect(test.Diagonals.Standard.Whole).toBe(0);
+                expect(test.Diagonals.Standard.Partial).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(3);
+                expect(test.Diagonals.Standard.Whole).toBe(0);
+                expect(test.Diagonals.Standard.Partial).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(4);
+                expect(test.Diagonals.Standard.Whole).toBe(0);
+                expect(test.Diagonals.Standard.Partial).toBe(1);
+                expect(test.Diagonals.Standard.PartialSteps).toBe(1);
+                expect(test.Diagonals.Parity.Partial).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(7);
+                expect(test.Diagonals.Standard.Whole).toBe(0);
+                expect(test.Diagonals.Standard.Partial).toBe(1);
+                expect(test.Diagonals.Standard.PartialSteps).toBe(4);
+                expect(test.Diagonals.Parity.Whole).toBe(0);
+                expect(test.Diagonals.Parity.Partial).toBe(2);
+                expect(test.Diagonals.Parity.PartialSteps).toBe(1);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(8);
+                expect(test.Diagonals.Standard.Whole).toBe(1);
+                expect(test.Diagonals.Standard.Partial).toBe(0);
+                expect(test.Diagonals.Parity.Partial).toBe(2);
+                expect(test.Diagonals.Parity.PartialSteps).toBe(2);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(9);
+                expect(test.Diagonals.Standard.Whole).toBe(1);
+                expect(test.Diagonals.Standard.Partial).toBe(0);
+                expect(test.Diagonals.Parity.Partial).toBe(2);
+                expect(test.Diagonals.Parity.PartialSteps).toBe(3);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(10);
+                expect(test.Diagonals.Standard.PartialSteps).toBe(1);
+                expect(test.Diagonals.Parity.Partial).toBe(2);
+                expect(test.Diagonals.Parity.PartialSteps).toBe(4);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(11);
+                expect(test.Diagonals.Standard.Whole).toBe(1);
+                expect(test.Diagonals.Parity.Whole).toBe(2);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(13);
+                expect(test.Diagonals.Standard.Whole).toBe(1);
+                expect(test.Diagonals.Standard.Partial).toBe(3);
+                expect(test.Diagonals.Standard.PartialSteps).toBe(4);
+                expect(test.Diagonals.Parity.Whole).toBe(2);
+                expect(test.Diagonals.Parity.Partial).toBe(4);
+                expect(test.Diagonals.Parity.PartialSteps).toBe(1);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(20);
+                expect(test.Diagonals.Standard.Whole).toBe(9); // 1 + 3 + 5
+                expect(test.Diagonals.Parity.Whole).toBe(6);   // 2 + 4
+            });
+            it(`Leading Edge - Cross`, () => {
+                let test: AllSectionResults;
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(1);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(2);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(1);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(3);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(2);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(4);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(3);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(5);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(1);
+                expect(test.Cross.Standard.PartialSteps).toBe(1);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(6);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(1);
+                expect(test.Cross.Standard.PartialSteps).toBe(2);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(7);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(1);
+                expect(test.Cross.Standard.PartialSteps).toBe(3);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(8);
+                expect(test.Cross.Standard.Whole).toBe(1);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(1);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(9);
+                expect(test.Cross.Standard.Whole).toBe(1);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(2);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(10);
+                expect(test.Cross.Standard.Whole).toBe(1);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(3);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(14);
+                expect(test.Cross.Standard.Whole).toBe(2);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(20);
+                expect(test.Cross.Parity.Whole).toBe(3);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(1);
+            });
+        });
+        
+        describe(`5x5`, () => {
+            const garden = new Garden();
+            garden.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(4, 4)));
+            it(`Garden Size`, () => {
+                const size: number = garden.getBounds().deltaX(true);
+                expect(size).toBe(5);
+            });
+            it(`Leading Edge - Cross`, () => {
+                let test: AllSectionResults;
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(1);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(3);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(0);
+                expect(test.Cross.Standard.PartialSteps).toBe(0);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(1);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(8);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(1);
+                expect(test.Cross.Standard.PartialSteps).toBe(1);
+                expect(test.Cross.Parity.Whole).toBe(0);
+                expect(test.Cross.Parity.Partial).toBe(1);
+                expect(test.Cross.Parity.PartialSteps).toBe(6);
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(9);
+                expect(test.Cross.Standard.Whole).toBe(0);
+                expect(test.Cross.Standard.Partial).toBe(1);
+                expect(test.Cross.Standard.PartialSteps).toBe(2);
+                expect(test.Cross.Parity.Whole).toBe(1);
+                expect(test.Cross.Parity.Partial).toBe(0);
+                expect(test.Cross.Parity.PartialSteps).toBe(0);
+            });
+            it(`Leading Edge - Diagonals - 1e6 Steps`, () => {
+                // Performance Test
+                let test: AllSectionResults;
+                // @ts-expect-error # Calling private method
+                test = garden._getSections(1e6);
+                expect(test.Diagonals.Standard.Whole).toBe(9999800001);
+                expect(test.Diagonals.Parity.Whole).toBe(9999900000);
+            });
+        });    
+    });
+    
     xit('Part 1', async () => {
         const solution = await part1(tinput, 6);
         expect(solution).toBe(16);
