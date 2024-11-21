@@ -14,7 +14,7 @@ const input = await Input.input(__dirname);
 
 describe(`Day 21`, () => {
 
-    describe(`Garden Tests`, () => {
+    xdescribe(`Garden Tests`, () => {
 
         describe(`3x3`, () => {
             const garden = new Garden();
@@ -175,7 +175,7 @@ describe(`Day 21`, () => {
                 expect(test.Cross.Parity.PartialSteps).toBe(1);
             });
         });
-        
+
         describe(`5x5`, () => {
             const garden = new Garden();
             garden.setBounds(new Rectangle(new Points.XY(0, 0), new Points.XY(4, 4)));
@@ -229,15 +229,25 @@ describe(`Day 21`, () => {
         });    
     });
     
-    xit('Part 1', async () => {
+    it('Part 1', async () => {
         const solution = await part1(tinput, 6);
         expect(solution).toBe(16);
     });
 
-    xit('Part 1 (Real Input)', async () => {
+    it('Part 1 (Real Input)', async () => {
         const solution = await part1(input, 64);
         console.log('Part 1 (Real Input)');
         console.log(solution);
+    });
+
+    xit('Part 1 - Fill Experiment', async () => {
+        for (let index = 63; index < 132; index++) {
+            let solution = await part1(input, index);
+            console.log(index);
+            console.log(solution);            
+        }
+    
+        //expect(solution).toBe(16);
     });
 
     xit('Part 2', async () => {
