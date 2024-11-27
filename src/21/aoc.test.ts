@@ -10,6 +10,8 @@ import * as Points from "../common/base/points";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const tinput = await Input.tinput(__dirname);
 //const tinput2 = await Input.tinput2(__dirname);
+const tinput3x3 = await Input.inputFileName(__dirname, "tinput3x3.txt");
+const tinput5x5 = await Input.inputFileName(__dirname, "tinput5x5.txt");
 const input = await Input.input(__dirname);
 
 describe(`Day 21`, () => {
@@ -226,37 +228,51 @@ describe(`Day 21`, () => {
                 expect(test.Diagonals.Standard.Whole).toBe(9999800001);
                 expect(test.Diagonals.Parity.Whole).toBe(9999900000);
             });
-        });    
+        });
     });
-    
+
     it('Part 1', async () => {
         const solution = await part1(tinput, 6);
         expect(solution).toBe(16);
     });
 
-    it('Part 1 (Real Input)', async () => {
+    xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input, 64);
         console.log('Part 1 (Real Input)');
         console.log(solution);
     });
 
-    xit('Part 1 - Fill Experiment', async () => {
-        for (let index = 63; index < 132; index++) {
-            let solution = await part1(input, index);
-            console.log(index);
-            console.log(solution);            
-        }
-    
-        //expect(solution).toBe(16);
+    it('Part 2 (3x3)', async () => {
+        const solution = await part2(tinput3x3, 13);
+        await part2(tinput3x3, 7);
+        await part2(tinput3x3, 13);
+        await part2(tinput3x3, 19);
     });
 
-    xit('Part 2', async () => {
-        const solution = await part2(tinput, 5000);
-        expect(solution).toBe(16733044);
+    it('Part 2 (5x5)', async () => {
+        // size = 5, steps = 32
+        // Distance to Edge = 2
+        await part2(tinput5x5, 12);
+        // Full Plots  : Normal = 9, Parity = 4
+        // Corner Plots: Normal = 3, Parity = 2
+        await part2(tinput5x5, 22);
+        // Full Plots  : Normal = 25, Parity = 16
+        // Corner Plots: Normal = 5, Parity = 4
+        await part2(tinput5x5, 32);
+        // Full Plots  : Normal = 49, Parity = 36
+        // Corner Plots: Normal = 7, Parity = 6
+        await part2(tinput5x5, 42);
+        //Full Plots  : Normal = 81, Parity = 64
+        //Corner Plots: Normal = 9, Parity = 8
+    });
+
+    xit('Part 2 (Test Input)', async () => {
+        // No general solution found
+        const solution = await part2(tinput, 27);
     });
 
     xit('Part 2 (Real Input)', async () => {
-        const solution = await part2(input, 64);
+        const solution = await part2(input, 26501365);
         console.log('Part 2 (Real Input)');
         console.log(solution);
     });

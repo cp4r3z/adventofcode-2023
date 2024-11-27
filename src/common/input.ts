@@ -19,3 +19,4 @@ async function readIfExists(path) {
 export const tinput = async (dirname:string)=> await readIfExists(path.resolve(dirname, 'tinput.txt'));
 export const tinput2 = async (dirname:string) => await readIfExists(path.resolve(dirname, 'tinput2.txt'));
 export const input = async (dirname:string)=> await readIfExists(path.resolve(dirname, 'input.txt'));
+export const inputFileName = async (dirName:string, fileName:string)=> await readIfExists(path.resolve(dirName, fileName));
