@@ -1,7 +1,7 @@
-import { INode, IGraph } from "../common/types";
 import { Direction, Grid2D, GridOptions } from "../common/grids/grid";
 import { XY, IPoint2D } from "../common/base/points";
-import { AStar, AStarHeuristicFunction } from "../common/grids/pathfinding/astar";
+import { AStar, AStarHeuristicFunction,  } from "./astar";
+import { INode, IGraph } from "../common/types";
 import { Rectangle } from "../common/base/shapes";
 
 class Block extends XY implements INode {
@@ -149,28 +149,28 @@ class City extends Map<string, Block> implements IGraph {
     }
 }
 
-const part1 = async (input: string): Promise<number | string> => {
-    const city = new City(0,3);
-    city.setFromString(input);   
-    //city.print();
+// Snow Island...
 
-    const heuristic: AStarHeuristicFunction = (point: Block) => XY.ManhattanDistance(point, city.goal);
-    const pathfinder = new AStar(city, heuristic);
-    const { path, cost } = pathfinder.findPath(city.start, city.goal);
+class SnowIsland extends Grid2D {
+    
+    
+}
+
+
+const part1 = async (input: string): Promise<number | string> => {
+    // const city = new City(0,3);
+    // city.setFromString(input);   
+    // //city.print();
+
+    // const heuristic: AStarHeuristicFunction = (point: Block) => XY.ManhattanDistance(point, city.goal);
+    // const pathfinder = new AStar(city, heuristic);
+    // const { path, cost } = pathfinder.findPath(city.start, city.goal);
     //city.print(path); // not working
-    return cost;
+    return 0;
 };
 
 const part2 = async (input: string): Promise<number | string> => {
-    const city = new City(3,10);    
-    city.setFromString(input);  
-    //city.print();
-
-    const heuristic: AStarHeuristicFunction = (point: Block) => XY.ManhattanDistance(point, city.goal);
-    const pathfinder = new AStar(city, heuristic);
-    const { path, cost } = pathfinder.findPath(city.start, city.goal);
-    //city.print(path);
-    return cost;
+    return 0;
 };
 
 export { part1, part2 };

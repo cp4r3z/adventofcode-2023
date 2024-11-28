@@ -66,7 +66,7 @@ class Garden extends Grid2D {
 
     // TODO: Override setBounds to set the bounds of plotsOdd / Even (Not necessary)
 
-    override getPointNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
+    override getNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
         const neighbors = [];
         for (const c of Direction.Cardinals) {
             const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
@@ -186,7 +186,7 @@ class Garden extends Grid2D {
         plotGrid.setGridPoint(plot);
         const plotHash: string = Grid2D.HashPointToKey(plot);
         this._visitedPlots.push(plotHash);
-        const neighbors = this.getPointNeighbors(plot);
+        const neighbors = this.getNeighbors(plot);
         neighbors.forEach(neighbor => {
             const neighborHash: string = Grid2D.HashPointToKey(neighbor);
             this._nextPlots.add(neighborHash);

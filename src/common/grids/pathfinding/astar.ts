@@ -1,7 +1,13 @@
+import { INode, IGraph } from "../../types";
 import { IPoint2D, XY } from "../../base/points";
 import { Grid2D } from "../grid";
 
-// Consider breaking into 2D / 3D versions
+/**
+ * References:
+ * https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode
+ */
+
+// There is a 2D version and a generic version
 
 export type AStarHeuristicFunction2D = (point: IPoint2D) => number;
 
@@ -137,7 +143,7 @@ export class AStar2D {
 
             openSet.delete(current);
 
-            let neighbors = this._grid.getPointNeighbors(current);
+            let neighbors = this._grid.getNeighbors(current);
             for (const neighbor of neighbors) {
                 // d(current,neighbor) is the weight of the edge from current to neighbor
                 // tentative_gScore is the distance from start to the neighbor through current
@@ -160,17 +166,17 @@ export class AStar2D {
     }
 }
 
-// put this somewhere high level?
-export interface INode {
-    // print function?
-    equals(other: INode): boolean;
-}
+// // put this somewhere high level?
+// export interface INode {
+//     // print function?
+//     equals(other: INode): boolean;
+// }
 
-export interface IGraph {
-    getNeighbors(node: INode): INode[];
-    getWeight(from: INode, to: INode): number;
-    print(path?: INode[]);
-}
+// export interface IGraph {
+//     getNeighbors(node: INode): INode[];
+//     getWeight(from: INode, to: INode): number;
+//     print(path?: INode[]);
+// }
 
 export type AStarHeuristicFunction = (node: INode) => number;
 

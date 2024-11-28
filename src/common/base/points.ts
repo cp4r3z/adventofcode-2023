@@ -1,4 +1,5 @@
-export interface IPoint { copy: Function, move: Function };
+import { IPoint } from "../types";
+
 export interface IPoint1D extends IPoint { x: number };
 export interface IPoint2D extends IPoint { x: number, y: number };
 export interface IPoint3D extends IPoint { x: number, y: number, z: number };
@@ -8,6 +9,9 @@ export class X implements IPoint1D {
 
     constructor(x?: number) {
         this.x = x ? x : 0;
+    }
+    equals(other: IPoint1D): boolean {
+        throw new Error("Method not implemented.");
     }
 
     copy = () => new X(this.x);
@@ -33,6 +37,11 @@ export class XY implements IPoint2D {
     constructor(x?: number, y?: number) {
         this.x = x ? x : 0;
         this.y = y ? y : 0;
+    }
+
+    // INode Implementation
+    equals(other: IPoint2D): boolean {
+        return XY.AreEqual(this, other);
     }
 
     copy = () => new XY(this.x, this.y);
@@ -77,6 +86,10 @@ export class XYZ implements IPoint3D {
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
+    }
+
+    equals(other: IPoint3D): boolean {
+        throw new Error("Method not implemented.");
     }
 
     copy = () => new XYZ(this.x, this.y, this.z);

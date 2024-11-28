@@ -1,3 +1,5 @@
+import { INode, IGraph } from '../types';
+
 import * as Points from "../base/points";
 import * as Shapes from "../base/shapes";
 
@@ -107,17 +109,18 @@ export module Direction {
     }
 }
 
-export class GridPoint extends Points.XY {
+export class GridPoint extends Points.XY implements INode {
     public Value: any;
     constructor(x: number, y: number, value: any) {
         super(x, y);
         this.Value = value;
     }
     print() { return this.Value; }
+
 }
 
 // Warning: Do not use the native Map set() function
-export class Grid2D extends Map<string, any> {
+export class Grid2D extends Map<string, any> implements IGraph {
     static HashPointToKey = (p: Points.IPoint2D): string => Grid2D.HashXYToKey(p.x, p.y);  //`X${p.x}Y${p.y}`; // maybe do some validation?
     static HashXYToKey = (x: number, y: number): string => `X${x}Y${y}`;
     static ReKey: RegExp = new RegExp(/([\-\d]+)/, 'g');
@@ -128,7 +131,7 @@ export class Grid2D extends Map<string, any> {
 
     protected bounds: Shapes.Rectangle = null;
 
-    private readonly options: GridOptions = {
+    protected readonly options: GridOptions = {
         setOnGet: true,
         defaultValue: ' ' // or null?
     }
@@ -201,22 +204,6 @@ export class Grid2D extends Map<string, any> {
 
         this.set(hash, value);
     };
-
-
-    getPointNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
-        const neighbors = [];
-
-        for (const c of Direction.Cardinals) {
-            const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
-            const neighbor: Points.IPoint2D = point.copy().move(xy);
-            const p = this.getPoint(neighbor);
-            if (this.bounds.hasPoint(p)) {
-                neighbors.push(p);
-            }
-
-        }
-        return neighbors;
-    }
 
     // TODO: SetFrom2DString, but give it a type?
 
@@ -329,6 +316,27 @@ export class Grid2D extends Map<string, any> {
         return digest;
     }
 
+    // #region IGraph Implementation
+    getNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
+        const neighbors = [];
+
+        for (const c of Direction.Cardinals) {
+            const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
+            const neighbor: Points.IPoint2D = point.copy().move(xy);
+            const p = this.getPoint(neighbor);
+            if (this.bounds.hasPoint(p)) {
+                neighbors.push(p);
+            }
+
+        }
+        return neighbors;
+    }
+
+    getWeight(from: Points.IPoint2D, to: Points.IPoint2D): number {
+        // I'm not sure if this is right, but we need something...
+        return Points.XY.ManhattanDistance(from, to);
+    }
+
     print = (yDown = true) => {
 
         const printLine = (y: number) => {
@@ -359,6 +367,7 @@ export class Grid2D extends Map<string, any> {
             }
         }
     }
+    // #endregion
 }
 
 export class Grid3D extends Map<string, any> {
