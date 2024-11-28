@@ -19,16 +19,15 @@ describe(`Day 22`, () => {
         //expect(solution).toBe(5);
     });
 
-    it('Part 1 (Real Input)', async () => {
+    xit('Part 1 (Real Input)', async () => {
         const solution = await part1(input);
         console.log('Part 1 (Real Input)');
-        console.log(solution);
-        //515 is too high!
+        console.log(solution);     
     });
 
-    xit('Part 2', async () => {
+    it('Part 2', async () => {
         const solution = await part2(tinput);
-        expect(solution).toBe(167409079868000);
+        expect(solution).toBe(7);
     });
 
     xit('Part 2 (Real Input)', async () => {
