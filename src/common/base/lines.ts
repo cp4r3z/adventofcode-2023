@@ -26,7 +26,6 @@ export class Line2D {
         return new Point.XY(x, y);
     }
 
-
      _p0: Point.XY;
      _p1: Point.XY;
 
@@ -43,6 +42,26 @@ export class Line2D {
     }
 
     toString = () => `(${this._p0.x},${this._p0.y})->(${this._p1.x},${this._p1.y})`;
+}
+
+export class Line3D {
+
+     _p0: Point.XYZ;
+     _p1: Point.XYZ;
+
+    // Order doesn't matter
+    constructor(p0: Point.IPoint3D, p1?: Point.IPoint3D) {
+        if (p0 && !p1) {
+            // Point
+            this._p0 = p0.copy();
+            this._p1 = p0.copy();
+            return;
+        }
+        this._p0 = p0.copy();
+        this._p1 = p1.copy();
+    }
+
+    toString = () => `(${this._p0.x},${this._p0.y},${this._p0.z})->(${this._p1.x},${this._p1.y},${this._p0.z})`;
 }
 
 
