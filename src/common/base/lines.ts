@@ -61,6 +61,8 @@ export class Line3D {
         this._p1 = p1.copy();
     }
 
+    //TODO: Getters?
+
     toString = () => `(${this._p0.x},${this._p0.y},${this._p0.z})->(${this._p1.x},${this._p1.y},${this._p0.z})`;
 }
 

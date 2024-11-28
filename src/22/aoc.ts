@@ -4,7 +4,7 @@ import { Rectangle } from '../common/base/shapes';
 
 class Block extends Line3D {
     public zOffset: number;
-    public zProfile: Rectangle; // we might be able to simply use a line here.
+    //public zProfile: Rectangle; // we might be able to simply use a line here.
     public parents: Block[];
     public id: string;
     private _zMax: number;
@@ -14,6 +14,17 @@ class Block extends Line3D {
         if (p0.x !== p1.x && p0.y !== p1.y && p0.z !== p1.z) {
             console.log('3d'); // doesn't look like it.
         }
+        // are the coordinates always "in order"?
+        if (p0.x > p1.x) {
+            console.warn('x not in order!');
+        }
+        if (p0.y > p1.y) {
+            console.warn('y not in order!');
+        }
+        if (p0.z > p1.z) {
+            console.warn('z not in order!');
+        }
+
         // normalize
         const zOffset = Math.min(p0.z, p1.z);
         p0.move(new XYZ(0, 0, - zOffset));
@@ -21,7 +32,7 @@ class Block extends Line3D {
         super(p0, p1);
         this.parents = [];
         this.zOffset = zOffset;
-        this.zProfile = new Rectangle(new XY(p0.x, p0.y), new XY(p1.x, p1.y));
+        //this.zProfile = new Rectangle(new XY(p0.x, p0.y), new XY(p1.x, p1.y));
         this._zMax = Math.max(this._p0.z, this._p1.z);
     }
 
@@ -31,8 +42,22 @@ class Block extends Line3D {
     public top = () => this._zMax + this.zOffset;
 
     public intersects(other: Block): boolean {
+        // return this.zProfile.intersects(other.zProfile); // <- This did work fine, think
+
         // Compare the z profiles (the shape looking down) to see if they compare
-        return this.zProfile.intersects(other.zProfile);
+        // does it intersect in the x direction?
+        const both = [this, other];
+        both.sort((a, b) => a._p0.x - b._p0.x); // low to high
+        // ok we know both[0] has a lower or equal x
+        // does both[1].p0.x <= both[0].p1.x
+        let intersects = both[1]._p0.x <= both[0]._p1.x;
+        if (!intersects) return false;
+
+        both.sort((a, b) => a._p0.y - b._p0.y); // low to high
+        // ok we know both[0] has a lower or equal y
+        intersects = both[1]._p0.y <= both[0]._p1.y;
+
+        return intersects;
     }
 }
 
@@ -83,7 +108,7 @@ export const part1 = async (input: string): Promise<number | string> => {
                 //console.log(`intersection between falling ${falling.id} and fallen ${f.id}`);
 
                 if (!intersected) {
-                    falling.zOffset = f.zOffset + 1; // only do this on first intersection!
+                    falling.zOffset = f.top() + 1; // only do this on first intersection!
                     falling.parents.push(f);
                     intersected = true;
                 } else {
@@ -91,9 +116,11 @@ export const part1 = async (input: string): Promise<number | string> => {
                     if (f.top() === falling.parents[0].top()) {
                         falling.parents.push(f);
                     }
+                    if (falling.parents.length > 2) {
+                        // I suppose to boost performance, we only need to consider the first 2 parents.
+                        //console.log(falling.parents.length);
+                    }
                 }
-                
-                // I suppose to boost performance, we only need to consider the first 2 parents.
             }
         }
         if (!intersected) {
@@ -111,9 +138,8 @@ export const part1 = async (input: string): Promise<number | string> => {
             doNotDisintegrate.add(block.parents[0]);
         }
     });
-    const disintegrate: Block[] = fallen.filter(block => !doNotDisintegrate.has(block));
 
-    return disintegrate.length;
+    return fallen.length - doNotDisintegrate.size;
 };
 
 export const part2 = async (input: string): Promise<number | string> => {

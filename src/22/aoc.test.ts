@@ -14,7 +14,7 @@ describe(`Day 22`, () => {
         expect(solution).toBe(5);
     });
 
-    it('Part 1 Tinput2', async () => {
+    xit('Part 1 Tinput2', async () => {
         const solution = await part1(tinput2);
         //expect(solution).toBe(5);
     });
