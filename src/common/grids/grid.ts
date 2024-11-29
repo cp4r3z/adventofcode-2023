@@ -141,9 +141,12 @@ export class Grid2D extends Map<string, any> implements IGraph {
         defaultValue: ' ' // or null?
     }
 
+    protected _neighborCache: Map<Points.IPoint2D, Points.IPoint2D[]>;
+
     constructor(options?: GridOptions) {
         super();
         if (options) this.options = options;
+        this._neighborCache = new Map<Points.IPoint2D, Points.IPoint2D[]>();
     }
 
     clear() {
@@ -323,7 +326,11 @@ export class Grid2D extends Map<string, any> implements IGraph {
 
     // #region IGraph Implementation
     getNeighbors(point: Points.IPoint2D): Points.IPoint2D[] {
-        const neighbors = [];
+        let neighbors = this._neighborCache.get(point);
+        if (Array.isArray(neighbors)) {
+            return neighbors;
+        }
+        neighbors = [];
 
         for (const c of Direction.Cardinals) {
             const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
