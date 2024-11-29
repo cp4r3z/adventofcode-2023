@@ -1,172 +1,79 @@
-import { Direction, Grid2D, GridOptions } from "../common/grids/grid";
+import { Direction, Grid2D, GridOptions, GridPoint, String2DOptions } from "../common/grids/grid";
 import { XY, IPoint2D } from "../common/base/points";
-import { AStar, AStarHeuristicFunction,  } from "./astar";
+import { AStar, AStarHeuristicFunction, } from "./astar";
 import { INode, IGraph } from "../common/types";
 import { Rectangle } from "../common/base/shapes";
 
-class Block extends XY implements INode {
-    public straightCount: number;
-    public direction: Direction.Cardinal;
-    public weight: number;
+class Trail extends GridPoint {
 
-    constructor(x: number, y: number, straightCount: number, direction: Direction.Cardinal, weight: number) {
-        super(x, y);
-        this.straightCount = straightCount;
-        this.direction = direction;
-        this.weight = weight;
-    }
-
-    equals(other: Block): boolean {
-        //throw new Error("Method not implemented.");
-        return XY.AreEqual(this, other);
-    }
-
-    hash(): string {
-        return `X${this.x}Y${this.y}S${this.straightCount}D${this.direction}`;
-    }
 }
 
-class City extends Map<string, Block> implements IGraph {
-    public start: Block;
-    public goal: Block;
-    public bounds: Rectangle
+class Island extends Grid2D {
 
-    constructor(public minStraight: number, public maxStraight: number) {
-        super();
-    }
+    public start: Trail;
+    public end: Trail;
 
-    setFromString(input: string) {
+    override setFromString2D = (input: string) => {
         const rows = input.split('\n');
-        const height = rows.length;
-        const width = rows[0].split('').length;
+        const yMax = rows.length - 1;
+        const xMax = rows[0].length - 1;
+        this.setBounds(new Rectangle(new XY(0, 0), new XY(xMax, yMax)));
 
         rows
             .forEach((row, y) => {
                 row.split('').forEach((s, x) => {
-                    let weight = parseInt(s);
-                    for (let sc = 0; sc <= this.maxStraight; sc++) { // account for different straightCounts
-                        for (const d of Direction.Cardinals) { // account for 4 directions
-                            const block = new Block(x, y, sc, d, weight);
-                            this.set(block.hash(), block);
-                            if (x === 0 && y === 0 && !this.start) {
-                                this.start = block;
-                            } else if (x === width - 1 && y === height - 1 && !this.goal) {
-                                this.goal = block;
-                            }
-                        }
+                    let val: any = s;
+                    if (s === '#') return;
+                    const trail = new Trail(x, y, val)
+                    this.setGridPoint(trail);
+                    if (x === 1 && y === 0) {
+                        this.start = trail;
+                    }
+                    if (x === xMax - 1 && y === yMax) {
+                        this.end = trail;
                     }
                 });
             });
-
-        this.bounds = new Rectangle(this.start, this.goal);
     };
 
-    getNeighbors(block: Block): Block[] {
-
-        const hash = (x: number, y: number, s: number, d: number): string => `X${x}Y${y}S${s}D${d}`;
-
+    override getNeighbors(trail: Trail): IPoint2D[] {
         const neighbors = [];
 
-        for (const c of Direction.Cardinals) {
-            const cxy: IPoint2D = Direction.CardinalToXY.get(c);
-            const xy: IPoint2D = block.copy().move(cxy);
-
-            // Are we in bounds?
-            if (!this.bounds.hasPoint(xy)) {
-                continue;
+        let potentialDirections = slopeMap.get(trail.Value);
+        for (const c of potentialDirections) {
+            const xy: IPoint2D = Direction.CardinalToXY.get(c);
+            const neighbor: IPoint2D = trail.copy().move(xy);
+            const p = this.getPoint(neighbor);
+            if (p && this.bounds.hasPoint(p)) {
+                neighbors.push(p);
             }
-
-            // Now figure out straight
-            let straightCount = block.straightCount;
-
-            if (block === this.start) {
-                // Special rules for the starting block.
-                straightCount = 1;
-            } else {
-                if (c === Direction.Back(block.direction)) {
-                    // back
-                    //straightCount = -1;
-                    continue;
-                } else if (c === block.direction) {
-                    // straight        
-                    straightCount++;            
-                    if (straightCount > this.maxStraight) {
-                        continue;
-                    }                  
-                } else {
-                    // left or right
-                    if (straightCount <= this.minStraight) {
-                        continue;
-                    }
-                    straightCount = 1;
-                }
-            }
-
-            const neighborHash = hash(xy.x, xy.y, straightCount, c);
-            const neighbor = this.get(neighborHash);
-            if (!neighbor){
-                debugger;
-            }
-            neighbors.push(neighbor);
         }
         return neighbors;
     }
-
-    getWeight(from: Block, to: Block): number {
-        if (!to){
-            debugger;
-        }
-        return to.weight;
-    }
-
-    print(path?: Block[]) {
-        const hash = (x: number, y: number) => `X${x}Y${y}S0D1`;
-
-        let printablePath: string | string[];
-        if (path) {
-            printablePath = path.map(b => hash(b.x, b.y));
-        }
-
-        const printLine = (y: number) => {
-            let line = '';
-            for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
-                const key = hash(x, y);
-                let value: string | number = ' ';
-                if (path) {
-                    if (printablePath.includes(key)) {
-                        value = this.get(key).weight;
-                    }
-                } else {
-                    value = this.get(key).weight;
-                }
-                line += value;
-            }
-            console.log(line);
-        }
-        for (let y = this.bounds.minY; y <= this.bounds.maxY; y++) {
-            printLine(y);
-        }
-    }
 }
 
-// Snow Island...
-
-class SnowIsland extends Grid2D {
-    
-    
+const islandOptions: GridOptions = {
+    setOnGet: false,
+    defaultValue: '#'
 }
 
+const slopeMap = new Map<string, Direction.Cardinal[]>();
+slopeMap.set('.', Direction.Cardinals)
+slopeMap.set('^', [Direction.Cardinal.North]);
+slopeMap.set('>', [Direction.Cardinal.East]);
+slopeMap.set('v', [Direction.Cardinal.South]);
+slopeMap.set('<', [Direction.Cardinal.West]);
 
 const part1 = async (input: string): Promise<number | string> => {
-    // const city = new City(0,3);
-    // city.setFromString(input);   
-    // //city.print();
+    const snowIsland = new Island(islandOptions);
+    snowIsland.setFromString2D(input);
+    //snowIsland.print();
 
-    // const heuristic: AStarHeuristicFunction = (point: Block) => XY.ManhattanDistance(point, city.goal);
-    // const pathfinder = new AStar(city, heuristic);
-    // const { path, cost } = pathfinder.findPath(city.start, city.goal);
-    //city.print(path); // not working
-    return 0;
+    const heuristic: AStarHeuristicFunction = (point: Trail) => XY.ManhattanDistance(point, snowIsland.end);
+    const pathfinder = new AStar(snowIsland, heuristic);
+    const { path, cost } = pathfinder.findPath(snowIsland.start, snowIsland.end);
+    snowIsland.print({path});
+    return cost;
 };
 
 const part2 = async (input: string): Promise<number | string> => {

@@ -1,6 +1,6 @@
 import { IPoint2D, XY } from "../base/points";
 import { Rectangle } from "../base/shapes";
-import { Grid2D, GridOptions, GridPoint } from "./grid";
+import { Grid2D, GridOptions, GridPoint, PrintOptions } from "./grid";
 
 export type GridOfGrid2DOptions = GridOptions & {
     singleRepeated: boolean;
@@ -92,7 +92,13 @@ export class GridOfGrid2D<SubGrid extends Grid2D>  extends Grid2D {
         return bounds;
     }
 
-    print = (yDown = true) => {
+
+    print = (options?: PrintOptions) => {
+        if (!options) {
+            options = {
+                yDown: true         
+            }
+        }
 
         // Figure out actual size of the grid
         const bounds = this.getBounds();
@@ -121,7 +127,7 @@ export class GridOfGrid2D<SubGrid extends Grid2D>  extends Grid2D {
             console.log(line);
         }
 
-        if (yDown) {
+        if (options.yDown) {
             for (let y = bounds.minY; y <= bounds.maxY; y++) {
                 printLine(y);
             }

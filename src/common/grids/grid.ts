@@ -18,6 +18,11 @@ export type String2DOptions = {
     parseInt: boolean
 }
 
+export type PrintOptions = {
+    yDown?: boolean,
+    path?: Points.IPoint2D[]
+}
+
 export module Direction {
     export enum Cardinal {
         North = 1 << 0, // 1
@@ -337,7 +342,14 @@ export class Grid2D extends Map<string, any> implements IGraph {
         return Points.XY.ManhattanDistance(from, to);
     }
 
-    print = (yDown = true) => {
+    print = (options?: PrintOptions) => {
+        let yDown = true;
+        let path = [];
+        if (options?.hasOwnProperty('yDown')) yDown = options.yDown;
+        if (options?.hasOwnProperty('path')) path = options.path;
+
+        // convert path to hashes...
+        const pathHash = options.path.map(point => Grid2D.HashPointToKey(point));
 
         const printLine = (y: number) => {
             let line = '';
@@ -349,9 +361,14 @@ export class Grid2D extends Map<string, any> implements IGraph {
                     if (this.options.setOnGet) {
                         this.set(key, value);
                     }
-                } else if (value?.print) {
+                }
+                if (value?.print) {
                     value = value.print();
                 }
+                if (pathHash.includes(key)) {
+                    value = 'O'; // Or some other path character
+                }
+
                 line += value;
             }
             console.log(line);

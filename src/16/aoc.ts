@@ -1,4 +1,4 @@
-import { Grid2D, GridOptions, Direction } from "../common/grids/grid";
+import { Grid2D, GridOptions, Direction, PrintOptions } from "../common/grids/grid";
 import D = Direction.Cardinal; //"Moving a type"
 import { XY, IPoint2D } from "../common/base/points";
 
@@ -163,7 +163,13 @@ class Contraption extends Grid2D {
         this.Beams = nextBeams;
     }
 
-    print = (yDown = true) => {
+    print = (options?: PrintOptions) => {
+        if (!options) {
+            options = {
+                yDown: true,
+                path: []
+            }
+        }
         const printLine = (y: number) => {
             let line = '';
             for (let x = this.bounds.minX; x <= this.bounds.maxX; x++) {
@@ -184,7 +190,7 @@ class Contraption extends Grid2D {
             console.log(line);
         }
 
-        if (yDown) {
+        if (options.yDown) {
             for (let y = this.bounds.minY; y <= this.bounds.maxY; y++) {
                 printLine(y);
             }

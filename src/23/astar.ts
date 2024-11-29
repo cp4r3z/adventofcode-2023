@@ -15,7 +15,8 @@ export type AStarHeuristicFunction = (node: INode) => number;
 export class NodeToNumberMap extends Map<INode, number> {
     get(key) {
         if (!this.has(key)) {
-            this.set(key, Number.MAX_SAFE_INTEGER); // TODO
+            this.set(key, Number.MAX_SAFE_INTEGER);
+            //this.set(key, 0); // That's not right
         }
         return super.get(key);
     }
@@ -73,14 +74,21 @@ export class AStar {
             return lowest;
         }
 
-        //let testcount = 0;
+        const highestFScore = (): INode => {
+            const openSetArray = [...openSet];
+            const sorted = openSetArray.sort((s1, s2) => {
+                const f1 = fScore.get(s1);
+                const f2 = fScore.get(s2);
+                return f2 - f1;
+            });
+            const highest = sorted[0];
+            return highest;
+        }
+
         while (openSet.size > 0) {
-            // testcount++;
-            // if (testcount === 1000) {
-            //     testcount = 0;
-            //     console.log(openSet.size);
-            // }
-            const current = lowestFScore();
+            
+            const current = highestFScore();
+            //const current = lowestFScore();
 
             if (current.equals(goal)) {
                 const path:any[] = this.reconstructPath(current);
@@ -96,10 +104,16 @@ export class AStar {
                 // tentative_gScore is the distance from start to the neighbor through current
                 const d: number = this.graph.getWeight(current, neighbor);
                 const tentativeGScore = gScore.get(current) + d;
+                
+                // if (tentativeGScore < gScore.get(neighbor)) { // MOD
                 if (tentativeGScore < gScore.get(neighbor)) {
+
                     // This path to neighbor is better than any previous one. Record it!
                     this.cameFrom.set(neighbor, current);
                     gScore.set(neighbor, tentativeGScore);
+                                        
+                    // maybe instead of the heuristic, we use the number of empty space?
+
                     fScore.set(neighbor, tentativeGScore + this.heuristic(neighbor));
                     openSet.add(neighbor);
                 }
