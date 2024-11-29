@@ -335,12 +335,14 @@ export class Grid2D extends Map<string, any> implements IGraph {
         for (const c of Direction.Cardinals) {
             const xy: Points.IPoint2D = Direction.CardinalToXY.get(c);
             const neighbor: Points.IPoint2D = point.copy().move(xy);
-            const p = this.getPoint(neighbor);
-            if (this.bounds.hasPoint(p)) {
-                neighbors.push(p);
-            }
-
+            const p = this.getPoint(neighbor); // Warning! Is setOnGet true?
+            if (!p) continue;
+            if (!this.bounds.hasPoint(p)) continue;
+            neighbors.push(p);
         }
+
+        this._neighborCache.set(point, neighbors);
+
         return neighbors;
     }
 
