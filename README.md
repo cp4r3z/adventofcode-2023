@@ -35,6 +35,9 @@ Stored the state flags as a BitInt using bitwise operators. Part 2 was some manu
 ## Day 21
 Oh dear...
 
+## Day 25
+*Minimum Cut* graph algorithm. I decided it might be fun to try an off the shelf library, and chose [Cytoscape](https://js.cytoscape.org/).
+
 # Setup
 
 ## Building
